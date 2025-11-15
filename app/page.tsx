@@ -1,8 +1,16 @@
-export default function Home() {
+import { parseMarkdownFile } from '@/lib/markdown/parser';
+import { MarkdownRenderer } from '@/components/markdown/MarkdownRenderer';
+
+/**
+ * Home page - renders the intro/default content
+ */
+export default async function Home() {
+  // Load the intro/default content
+  const { content } = await parseMarkdownFile('intro');
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-24">
-      <h1 className="text-4xl font-bold">Notion-like Landing Page</h1>
-      <p className="mt-4 text-lg">Project initialized successfully!</p>
-    </main>
+    <article className="prose prose-slate max-w-none dark:prose-invert">
+      <MarkdownRenderer content={content} />
+    </article>
   );
 }
