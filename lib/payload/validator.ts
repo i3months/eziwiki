@@ -1,7 +1,6 @@
 import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
 import { payloadSchema } from './schema';
-import { Payload } from './types';
 
 /**
  * Validates payload against JSON Schema
