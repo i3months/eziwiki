@@ -7,13 +7,15 @@ import { Payload } from '@/lib/payload/types';
 export const payload: Payload = {
   global: {
     title: 'Documentation Site',
-    description: 'A beautiful documentation site built with Next.js',
+    description:
+      'A beautiful documentation site built with Next.js, inspired by Notion and Obsidian',
     favicon: '/favicon.ico',
     baseUrl: 'https://example.com',
     seo: {
       openGraph: {
-        title: 'Documentation Site',
-        description: 'A beautiful documentation site built with Next.js',
+        title: 'Documentation Site - Modern Static Site Generator',
+        description:
+          'A beautiful documentation site built with Next.js, inspired by Notion and Obsidian',
         images: [
           {
             url: '/og-image.jpg',
