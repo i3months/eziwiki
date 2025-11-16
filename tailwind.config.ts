@@ -46,6 +46,8 @@ const config: Config = {
             '--tw-prose-quotes': 'var(--color-text-muted)',
             color: 'var(--color-text)',
             maxWidth: 'none',
+            fontSize: '1rem',
+            lineHeight: '1.75',
             a: {
               color: 'var(--color-primary)',
               textDecoration: 'none',
@@ -69,6 +71,70 @@ const config: Config = {
             pre: {
               backgroundColor: 'var(--color-code-bg)',
               color: 'var(--color-code-text)',
+            },
+            h1: {
+              fontSize: '2rem',
+              lineHeight: '1.2',
+              fontWeight: '700',
+            },
+            h2: {
+              fontSize: '1.75rem',
+              lineHeight: '1.3',
+              fontWeight: '600',
+            },
+            h3: {
+              fontSize: '1.5rem',
+              lineHeight: '1.4',
+              fontWeight: '600',
+            },
+            h4: {
+              fontSize: '1.25rem',
+              lineHeight: '1.5',
+              fontWeight: '600',
+            },
+          },
+        },
+        sm: {
+          css: {
+            fontSize: '0.875rem',
+            lineHeight: '1.7',
+            h1: {
+              fontSize: '1.75rem',
+              lineHeight: '1.2',
+            },
+            h2: {
+              fontSize: '1.5rem',
+              lineHeight: '1.3',
+            },
+            h3: {
+              fontSize: '1.25rem',
+              lineHeight: '1.4',
+            },
+            h4: {
+              fontSize: '1.125rem',
+              lineHeight: '1.5',
+            },
+          },
+        },
+        lg: {
+          css: {
+            fontSize: '1.125rem',
+            lineHeight: '1.8',
+            h1: {
+              fontSize: '2.5rem',
+              lineHeight: '1.2',
+            },
+            h2: {
+              fontSize: '2rem',
+              lineHeight: '1.3',
+            },
+            h3: {
+              fontSize: '1.75rem',
+              lineHeight: '1.4',
+            },
+            h4: {
+              fontSize: '1.5rem',
+              lineHeight: '1.5',
             },
           },
         },
