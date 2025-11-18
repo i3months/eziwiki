@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { NavigationItem } from '@/lib/payload/types';
@@ -12,10 +12,6 @@ import { useTabStore } from '@/lib/store/tabStore';
 interface SidebarProps {
   /** Array of top-level navigation items */
   navigation: NavigationItem[];
-  /** Whether the sidebar is collapsed */
-  isCollapsed?: boolean;
-  /** Callback to toggle sidebar collapse state */
-  onToggle?: () => void;
 }
 
 /**
@@ -196,26 +192,91 @@ function NavigationItemComponent({
  * <Sidebar navigation={navigation} />
  * ```
  */
-export function Sidebar({ navigation, isCollapsed = false, onToggle }: SidebarProps) {
+export function Sidebar({ navigation }: SidebarProps) {
   const pathname = usePathname();
   const currentPath = pathname === '/' ? '' : pathname.slice(1);
+  const { sidebarWidth, sidebarCollapsed, setSidebarWidth, setSidebarCollapsed } = useTabStore();
+
+  const sidebarRef = useRef<HTMLDivElement>(null);
+  const [isResizing, setIsResizing] = useState(false);
+
+  const MIN_WIDTH = 200;
+  const MAX_WIDTH = 600;
+  const COLLAPSE_THRESHOLD = 150; // 이 너비 이하로 드래그하면 자동 collapse
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isResizing) return;
+
+      const newWidth = e.clientX;
+
+      // 너비가 collapse threshold 이하로 내려가면 collapse
+      if (newWidth < COLLAPSE_THRESHOLD) {
+        setSidebarCollapsed(true);
+        setIsResizing(false);
+        // 즉시 cursor와 userSelect 리셋
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+        return;
+      }
+
+      // 최소/최대 너비 제한
+      if (newWidth >= MIN_WIDTH && newWidth <= MAX_WIDTH) {
+        setSidebarWidth(newWidth);
+        setSidebarCollapsed(false);
+      }
+    };
+
+    const handleMouseUp = () => {
+      setIsResizing(false);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+
+    if (isResizing) {
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      // cleanup 시에도 리셋
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+  }, [isResizing, setSidebarWidth, setSidebarCollapsed]);
+
+  const handleToggle = () => {
+    setSidebarCollapsed(!sidebarCollapsed);
+  };
+
+  const handleResizeStart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsResizing(true);
+  };
 
   return (
     <aside
-      className={`hidden md:block h-screen sticky top-0 bg-gray-50 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 overflow-y-auto transition-all duration-300 ${
-        isCollapsed ? 'w-16' : 'w-64'
-      }`}
+      ref={sidebarRef}
+      className="hidden md:block h-screen sticky top-0 bg-gray-50 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 overflow-y-auto relative"
+      style={{
+        width: sidebarCollapsed ? '64px' : `${sidebarWidth}px`,
+        transition: isResizing ? 'none' : 'width 0.3s ease',
+      }}
     >
       {/* Toggle button */}
       <div className="flex justify-end p-2 border-b border-gray-200 dark:border-gray-800">
         <button
-          onClick={onToggle}
+          onClick={handleToggle}
           className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-md transition-colors"
-          aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
           <svg
-            className={`w-5 h-5 transition-transform ${isCollapsed ? 'rotate-180' : ''}`}
+            className={`w-5 h-5 transition-transform ${sidebarCollapsed ? 'rotate-180' : ''}`}
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -231,7 +292,7 @@ export function Sidebar({ navigation, isCollapsed = false, onToggle }: SidebarPr
       </div>
 
       {/* Navigation */}
-      {!isCollapsed && (
+      {!sidebarCollapsed && (
         <nav className="p-4">
           {navigation.map((item, index) => (
             <NavigationItemComponent
@@ -243,6 +304,18 @@ export function Sidebar({ navigation, isCollapsed = false, onToggle }: SidebarPr
             />
           ))}
         </nav>
+      )}
+
+      {/* Resize handle */}
+      {!sidebarCollapsed && (
+        <div
+          className="absolute top-0 right-0 w-1 h-full bg-transparent hover:bg-blue-500 transition-colors cursor-col-resize z-50"
+          onMouseDown={handleResizeStart}
+          style={{
+            right: '-2px',
+            width: '5px',
+          }}
+        />
       )}
     </aside>
   );

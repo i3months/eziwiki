@@ -44,7 +44,6 @@ interface PageLayoutProps {
  */
 export function PageLayout({ navigation, children }: PageLayoutProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -52,10 +51,6 @@ export function PageLayout({ navigation, children }: PageLayoutProps) {
 
   const closeMobileMenu = () => {
     setIsMobileMenuOpen(false);
-  };
-
-  const toggleSidebar = () => {
-    setIsSidebarCollapsed(!isSidebarCollapsed);
   };
 
   return (
@@ -89,11 +84,7 @@ export function PageLayout({ navigation, children }: PageLayoutProps) {
       {/* Main layout grid */}
       <div className="flex">
         {/* Desktop sidebar */}
-        <Sidebar
-          navigation={navigation}
-          isCollapsed={isSidebarCollapsed}
-          onToggle={toggleSidebar}
-        />
+        <Sidebar navigation={navigation} />
 
         {/* Main content area */}
         <main className="flex-1 min-w-0 flex flex-col">
