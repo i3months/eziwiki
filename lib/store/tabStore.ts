@@ -13,6 +13,8 @@ interface TabStore {
   activeTabId: string | null;
   sidebarWidth: number;
   sidebarCollapsed: boolean;
+  hasHydrated: boolean;
+  setHasHydrated: (hydrated: boolean) => void;
   addTab: (tab?: Omit<Tab, 'id'>) => string;
   removeTab: (id: string) => void;
   setActiveTab: (id: string) => void;
@@ -31,6 +33,11 @@ export const useTabStore = create<TabStore>()(
       activeTabId: null,
       sidebarWidth: 256, // Default 256px (w-64)
       sidebarCollapsed: false,
+      hasHydrated: false,
+
+      setHasHydrated: (hydrated) => {
+        set({ hasHydrated: hydrated });
+      },
 
       addTab: (tab) => {
         const { tabs } = get();
@@ -128,6 +135,9 @@ export const useTabStore = create<TabStore>()(
         sidebarWidth: state.sidebarWidth,
         sidebarCollapsed: state.sidebarCollapsed,
       }),
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
     },
   ),
 );
