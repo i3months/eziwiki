@@ -1,30 +1,23 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { useTabStore } from '@/lib/store/tabStore';
 
 /**
  * Home page - shows empty state for New Tab
  */
 export default function Home() {
-  const router = useRouter();
-  const { tabs, addTab, hasHydrated, activeTabId } = useTabStore();
+  const { tabs, addTab, hasHydrated } = useTabStore();
 
-  // Redirect to active tab's path if it exists
+  // Ensure at least one tab exists after hydration
   useEffect(() => {
     if (!hasHydrated) return;
 
-    const activeTab = tabs.find((tab) => tab.id === activeTabId);
-
-    if (activeTab && activeTab.path) {
-      // Active tab has a path, redirect to it
-      router.replace(`/${activeTab.path}`);
-    } else if (tabs.length === 0) {
+    if (tabs.length === 0) {
       // No tabs exist, create one
       addTab();
     }
-  }, [hasHydrated, tabs, activeTabId, addTab, router]);
+  }, [hasHydrated, tabs.length, addTab]);
 
   // Show empty state for home/new tab
   return (

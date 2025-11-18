@@ -64,6 +64,19 @@ export function PageLayout({ navigation, children }: PageLayoutProps) {
     // Remove leading and trailing slashes
     const currentPath = pathname === '/' ? '' : pathname.slice(1).replace(/\/$/, '');
 
+    // Get the latest state
+    const { tabs, updateTabPath } = useTabStore.getState();
+    const activeTab = tabs.find((tab) => tab.id === activeTabId);
+
+    if (!activeTab) return;
+
+    // Don't update if tab is already on home page (New Tab)
+    const isHomePage = currentPath === '';
+    if (isHomePage && activeTab.path === '') {
+      // Both are home, no update needed
+      return;
+    }
+
     // Find navigation item that matches current path
     const findNavItem = (items: NavigationItem[], path: string): NavigationItem | null => {
       for (const item of items) {
@@ -77,16 +90,9 @@ export function PageLayout({ navigation, children }: PageLayoutProps) {
     };
 
     const navItem = findNavItem(navigation, currentPath);
-    const isHomePage = currentPath === '';
-
-    // Get the latest state and update
-    const { tabs, updateTabPath } = useTabStore.getState();
-    const activeTab = tabs.find((tab) => tab.id === activeTabId);
-
-    if (!activeTab) return;
 
     if (isHomePage) {
-      // Home page - update to "Home"
+      // Home page - update to "Home" only if tab had a different path
       if (activeTab.path !== '') {
         updateTabPath(activeTabId, '', 'Home');
       }
