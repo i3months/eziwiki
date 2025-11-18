@@ -64,11 +64,13 @@ function NavigationItemComponent({
   const handleLinkClick = (e: React.MouseEvent) => {
     if (item.path) {
       e.preventDefault();
+      const { tabs } = useTabStore.getState();
+
       if (activeTabId) {
         // Update only the active tab's path
         updateTabPath(activeTabId, item.path, item.name);
-      } else {
-        // No active tab, create a new one
+      } else if (tabs.length === 0) {
+        // No tabs at all, create a new one
         const { addTab } = useTabStore.getState();
         addTab({ title: item.name, path: item.path });
       }
