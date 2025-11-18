@@ -1,8 +1,10 @@
 import { parseMarkdownFile } from '@/lib/markdown/parser';
 import { MarkdownRenderer } from '@/components/markdown/MarkdownRenderer';
+import { MarkdownSkeleton } from '@/components/markdown/MarkdownSkeleton';
 import { extractAllPaths } from '@/lib/navigation/builder';
 import { payload } from '@/payload/config';
 import { notFound } from 'next/navigation';
+import { Suspense } from 'react';
 import type { Metadata } from 'next';
 
 interface PageProps {
@@ -71,6 +73,18 @@ export async function generateStaticParams() {
 }
 
 /**
+ * Content component that loads and renders markdown
+ */
+async function MarkdownContent({ path }: { path: string }) {
+  try {
+    const { content } = await parseMarkdownFile(path);
+    return <MarkdownRenderer content={content} />;
+  } catch (error) {
+    notFound();
+  }
+}
+
+/**
  * Dynamic content page component
  * Renders Markdown content based on the URL slug
  */
@@ -78,16 +92,11 @@ export default async function ContentPage({ params }: PageProps) {
   const { slug } = params;
   const path = slug.join('/');
 
-  try {
-    const { content } = await parseMarkdownFile(path);
-
-    return (
-      <article className="prose prose-slate max-w-none dark:prose-invert">
-        <MarkdownRenderer content={content} />
-      </article>
-    );
-  } catch (error) {
-    // If content file doesn't exist, show 404
-    notFound();
-  }
+  return (
+    <article className="prose prose-slate max-w-none dark:prose-invert">
+      <Suspense fallback={<MarkdownSkeleton />}>
+        <MarkdownContent path={path} />
+      </Suspense>
+    </article>
+  );
 }
