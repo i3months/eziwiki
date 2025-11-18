@@ -51,9 +51,15 @@ function NavigationItemComponent({
 }: NavigationItemComponentProps) {
   const [isExpanded, setIsExpanded] = useState(true);
   const router = useRouter();
-  const { activeTabId, updateTabPath } = useTabStore();
+  const { activeTabId, tabs, updateTabPath } = useTabStore();
   const hasChildren = item.children && item.children.length > 0;
-  const isActive = item.path === currentPath;
+
+  // Get the active tab's path
+  const activeTab = tabs.find((tab) => tab.id === activeTabId);
+  const activeTabPath = activeTab?.path || '';
+
+  // Check if this item matches the active tab's path
+  const isActive = item.path === activeTabPath;
 
   const handleToggle = (e: React.MouseEvent) => {
     if (hasChildren) {
