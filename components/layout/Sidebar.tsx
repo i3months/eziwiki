@@ -261,7 +261,7 @@ export function Sidebar({ navigation }: SidebarProps) {
       }}
     >
       {/* Toggle button */}
-      <div className="flex justify-end p-2 border-b border-gray-200 dark:border-gray-800">
+      <div className="flex items-center justify-end px-2 py-1 border-b border-gray-200 dark:border-gray-800">
         <button
           onClick={handleToggle}
           className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-md transition-colors"
@@ -269,9 +269,9 @@ export function Sidebar({ navigation }: SidebarProps) {
           title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
           {sidebarCollapsed ? (
-            <ChevronsRight className="w-5 h-5" />
+            <ChevronsRight className="w-4 h-4" />
           ) : (
-            <ChevronsLeft className="w-5 h-5" />
+            <ChevronsLeft className="w-4 h-4" />
           )}
         </button>
       </div>
