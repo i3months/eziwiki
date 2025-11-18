@@ -70,10 +70,9 @@ export function PageLayout({ navigation, children }: PageLayoutProps) {
 
     if (!activeTab) return;
 
-    // Don't update if tab is already on home page (New Tab)
+    // Home page - don't update, keep as "New Tab"
     const isHomePage = currentPath === '';
-    if (isHomePage && activeTab.path === '') {
-      // Both are home, no update needed
+    if (isHomePage) {
       return;
     }
 
@@ -91,12 +90,7 @@ export function PageLayout({ navigation, children }: PageLayoutProps) {
 
     const navItem = findNavItem(navigation, currentPath);
 
-    if (isHomePage) {
-      // Home page - update to "Home" only if tab had a different path
-      if (activeTab.path !== '') {
-        updateTabPath(activeTabId, '', 'Home');
-      }
-    } else if (navItem && activeTab.path !== currentPath) {
+    if (navItem && activeTab.path !== currentPath) {
       // Regular page - update to match navigation item
       updateTabPath(activeTabId, currentPath, navItem.name);
     }
