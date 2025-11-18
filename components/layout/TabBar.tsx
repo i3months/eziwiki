@@ -3,11 +3,20 @@
 import React, { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTabStore } from '@/lib/store/tabStore';
+import { TabBarSkeleton } from './TabBarSkeleton';
 
 export function TabBar() {
   const router = useRouter();
-  const { tabs, activeTabId, addTab, setActiveTab, removeTab, closeOtherTabs, closeTabsToRight } =
-    useTabStore();
+  const {
+    tabs,
+    activeTabId,
+    addTab,
+    setActiveTab,
+    removeTab,
+    closeOtherTabs,
+    closeTabsToRight,
+    hasHydrated,
+  } = useTabStore();
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number; tabId: string } | null>(
     null,
   );
@@ -69,6 +78,11 @@ export function TabBar() {
       return () => document.removeEventListener('click', handleCloseContextMenu);
     }
   }, [contextMenu]);
+
+  // Show skeleton while hydrating
+  if (!hasHydrated) {
+    return <TabBarSkeleton />;
+  }
 
   return (
     <div
