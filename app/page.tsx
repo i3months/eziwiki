@@ -7,14 +7,14 @@ import { useTabStore } from '@/lib/store/tabStore';
  * Home page - shows empty state for New Tab
  */
 export default function Home() {
-  const { tabs, addTab } = useTabStore();
+  const { tabs, addTab, hasHydrated } = useTabStore();
 
-  // Ensure at least one tab exists on mount
+  // Ensure at least one tab exists after hydration is complete
   useEffect(() => {
-    if (tabs.length === 0) {
+    if (hasHydrated && tabs.length === 0) {
       addTab();
     }
-  }, [tabs.length, addTab]);
+  }, [hasHydrated, tabs.length, addTab]);
 
   // Show empty state for home/new tab
   return (
