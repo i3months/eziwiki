@@ -18,7 +18,7 @@ export const payload: Payload = {
           'A beautiful documentation site built with Next.js, inspired by Notion and Obsidian',
         images: [
           {
-            url: '/og-image.jpg',
+            url: '/og-image.svg',
             width: 1200,
             height: 630,
             alt: 'Documentation Site',
