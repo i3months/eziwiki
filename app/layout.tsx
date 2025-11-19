@@ -4,7 +4,6 @@ import '@/styles/theme.css';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { payload } from '@/payload/config';
 import { validatePayload } from '@/lib/payload/validator';
-import { loadTheme } from '@/lib/theme/loader';
 
 // Validate payload at build time
 const validation = validatePayload(payload);
@@ -13,9 +12,6 @@ if (!validation.valid) {
   validation.errors?.forEach((err) => console.error(`  - ${err}`));
   throw new Error('Invalid payload configuration. Please fix the errors above.');
 }
-
-// Load and process theme
-const { styleObject } = loadTheme(payload.theme);
 
 // Generate metadata from payload
 export const metadata: Metadata = {
@@ -36,7 +32,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" style={styleObject}>
+    <html lang="en">
       <body>
         <PageLayout navigation={payload.navigation}>{children}</PageLayout>
       </body>
