@@ -137,16 +137,30 @@ export function MarkdownRenderer({ content }: MarkdownRendererProps) {
           const childArray = React.Children.toArray(children);
           const codeElement = childArray[0] as any;
 
+          // Helper function to extract text content from children
+          const extractText = (node: any): string => {
+            if (typeof node === 'string') return node;
+            if (typeof node === 'number') return String(node);
+            if (Array.isArray(node)) return node.map(extractText).join('');
+            if (React.isValidElement(node)) {
+              const props = node.props as any;
+              if (props?.children) {
+                return extractText(props.children);
+              }
+            }
+            return '';
+          };
+
           if (codeElement?.props?.className) {
             const match = /language-(\w+)/.exec(codeElement.props.className || '');
             const language = match ? match[1] : 'text';
-            const code = String(codeElement.props.children).replace(/\n$/, '');
+            const code = extractText(codeElement.props.children).replace(/\n$/, '');
 
             return <CodeBlock language={language} code={code} />;
           }
 
           // Fallback for code blocks without language
-          const code = String(codeElement?.props?.children || '').replace(/\n$/, '');
+          const code = extractText(codeElement?.props?.children || '').replace(/\n$/, '');
           return <CodeBlock language="text" code={code} />;
         },
         img: ({ src, alt }) => (
