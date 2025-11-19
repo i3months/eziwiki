@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 /**
  * Props for the CodeBlock component
@@ -46,7 +48,7 @@ export function CodeBlock({ language, code }: CodeBlockProps) {
 
   return (
     <div className="relative group mb-4">
-      <div className="flex items-center justify-between bg-gray-900 dark:bg-black px-4 py-2 rounded-t-lg border-b border-gray-700 dark:border-gray-800">
+      <div className="flex items-center justify-between bg-[#1e1e1e] px-4 py-2 rounded-t-lg border-b border-gray-700">
         <span className="text-xs font-mono text-gray-400 uppercase">{language || 'text'}</span>
         <button
           onClick={handleCopy}
@@ -56,9 +58,25 @@ export function CodeBlock({ language, code }: CodeBlockProps) {
           {copied ? '✓ Copied' : 'Copy'}
         </button>
       </div>
-      <pre className="bg-gray-900 dark:bg-black p-4 overflow-x-auto rounded-b-lg m-0">
-        <code className="text-sm font-mono text-gray-100 block">{code}</code>
-      </pre>
+      <SyntaxHighlighter
+        language={language}
+        style={vscDarkPlus}
+        customStyle={{
+          margin: 0,
+          borderTopLeftRadius: 0,
+          borderTopRightRadius: 0,
+          borderBottomLeftRadius: '0.5rem',
+          borderBottomRightRadius: '0.5rem',
+          fontSize: '0.875rem',
+        }}
+        codeTagProps={{
+          style: {
+            fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+          },
+        }}
+      >
+        {code}
+      </SyntaxHighlighter>
     </div>
   );
 }
