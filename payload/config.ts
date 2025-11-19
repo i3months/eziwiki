@@ -33,6 +33,10 @@ export const payload: Payload = {
       path: 'intro',
     },
     {
+      name: '🧪 Markdown Test',
+      path: 'test-all-markdown',
+    },
+    {
       name: 'Tutorials',
       children: [
         {
