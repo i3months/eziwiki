@@ -92,7 +92,7 @@ function NavigationItemComponent({
         {level > 0 && (
           <div className="absolute left-0 top-0 bottom-0 flex">
             {parentLines.map((showLine, idx) => (
-              <div key={idx} className="relative" style={{ width: '16px' }}>
+              <div key={idx} className="relative" style={{ width: '20px' }}>
                 {showLine && (
                   <div className="absolute left-1/2 top-0 bottom-0 w-px bg-gray-300 dark:bg-gray-700" />
                 )}
@@ -103,7 +103,7 @@ function NavigationItemComponent({
 
         <div
           className="flex items-center"
-          style={{ marginLeft: level > 0 ? `${parentLines.length * 16}px` : '0' }}
+          style={{ marginLeft: level > 0 ? `${parentLines.length * 20}px` : '0' }}
         >
           {hasChildren && (
             <button
@@ -121,7 +121,7 @@ function NavigationItemComponent({
             <Link
               href={`/${item.path}`}
               onClick={handleLinkClick}
-              className={`flex-1 px-2 py-0.5 rounded-md text-sm transition-colors touch-manipulation ${
+              className={`flex-1 px-2 py-1 rounded-md text-sm transition-colors touch-manipulation ${
                 isActive
                   ? 'bg-blue-100 dark:bg-blue-900 text-blue-900 dark:text-blue-100 font-medium'
                   : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 active:bg-gray-200 dark:active:bg-gray-700'
@@ -132,7 +132,7 @@ function NavigationItemComponent({
             </Link>
           ) : (
             <div
-              className={`flex-1 px-2 py-0.5 text-sm font-semibold text-gray-900 dark:text-gray-100 ${
+              className={`flex-1 px-2 py-1 text-sm font-semibold text-gray-900 dark:text-gray-100 ${
                 !hasChildren ? 'ml-5' : ''
               }`}
             >
@@ -320,7 +320,7 @@ export function Sidebar({ navigation }: SidebarProps) {
 
       {/* Navigation */}
       {!sidebarCollapsed && (
-        <nav className="p-1.5">
+        <nav className="p-2">
           {filteredNavigation.length > 0 ? (
             filteredNavigation.map((item, index) => (
               <NavigationItemComponent
