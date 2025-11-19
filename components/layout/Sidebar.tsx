@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { ChevronRight, ChevronsLeft, ChevronsRight, Search } from 'lucide-react';
 import { NavigationItem } from '@/lib/payload/types';
 import { useTabStore } from '@/lib/store/tabStore';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 /**
  * Props for the Sidebar component
@@ -292,30 +293,38 @@ export function Sidebar({ navigation }: SidebarProps) {
     >
       {/* Search and Toggle */}
       <div className="flex items-center gap-2 px-2 py-1 border-b border-gray-200 dark:border-gray-800">
-        {!sidebarCollapsed && (
-          <div className="flex-1 flex items-center gap-2 px-2 py-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md min-w-0">
-            <Search className="w-4 h-4 text-gray-400 dark:text-gray-500 flex-shrink-0" />
-            <input
-              type="text"
-              placeholder="Search titles..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="flex-1 bg-transparent text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 outline-none min-w-0"
-            />
-          </div>
-        )}
-        <button
-          onClick={handleToggle}
-          className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-md transition-colors flex-shrink-0"
-          aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-        >
-          {sidebarCollapsed ? (
+        {!sidebarCollapsed ? (
+          <>
+            <div className="flex-1 flex items-center gap-2 px-2 py-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md min-w-0">
+              <Search className="w-4 h-4 text-gray-400 dark:text-gray-500 flex-shrink-0" />
+              <input
+                type="text"
+                placeholder="Search titles..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="flex-1 bg-transparent text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 outline-none min-w-0"
+              />
+            </div>
+            <ThemeToggle />
+            <button
+              onClick={handleToggle}
+              className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-md transition-colors flex-shrink-0"
+              aria-label="Collapse sidebar"
+              title="Collapse sidebar"
+            >
+              <ChevronsLeft className="w-4 h-4" />
+            </button>
+          </>
+        ) : (
+          <button
+            onClick={handleToggle}
+            className="p-2 mx-auto text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-md transition-colors"
+            aria-label="Expand sidebar"
+            title="Expand sidebar"
+          >
             <ChevronsRight className="w-4 h-4" />
-          ) : (
-            <ChevronsLeft className="w-4 h-4" />
-          )}
-        </button>
+          </button>
+        )}
       </div>
 
       {/* Navigation */}

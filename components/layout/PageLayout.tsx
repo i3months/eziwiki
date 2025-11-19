@@ -8,6 +8,7 @@ import { Sidebar } from './Sidebar';
 import { MobileMenu } from './MobileMenu';
 import { TabBar } from './TabBar';
 import { Breadcrumb } from './Breadcrumb';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 /**
  * Props for the PageLayout component
@@ -120,7 +121,7 @@ export function PageLayout({ navigation, children }: PageLayoutProps) {
             </svg>
           </button>
           <h1 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Documentation</h1>
-          <div className="w-10" /> {/* Spacer for centering */}
+          <ThemeToggle />
         </div>
       </header>
 
