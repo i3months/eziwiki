@@ -24,15 +24,15 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const { frontmatter } = await parseMarkdownFile(path);
 
     return {
-      title: frontmatter.title || payload.global.title,
-      description: frontmatter.description || payload.global.description,
+      title: (frontmatter.title as string) || payload.global.title,
+      description: (frontmatter.description as string) || payload.global.description,
       icons: {
-        icon: frontmatter.favicon || payload.global.favicon || '/favicon.ico',
+        icon: (frontmatter.favicon as string) || payload.global.favicon || '/favicon.ico',
       },
       openGraph: {
-        title: frontmatter.title || payload.global.title,
-        description: frontmatter.description || payload.global.description,
-        images: frontmatter.ogImage ? [frontmatter.ogImage] : undefined,
+        title: (frontmatter.title as string) || payload.global.title,
+        description: (frontmatter.description as string) || payload.global.description,
+        images: frontmatter.ogImage ? [frontmatter.ogImage as string] : undefined,
       },
     };
   } catch {
