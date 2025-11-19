@@ -72,6 +72,10 @@ _Italic Text_
 
 ![Image with Title](https://via.placeholder.com/200 'Image Title')
 
+### Local Image Test
+
+![Sample Image](/images/docs/sample.jpg)
+
 ### Local Image Usage Example
 
 To add images, save them in the `public/images/` folder and reference like this:
