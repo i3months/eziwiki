@@ -127,7 +127,11 @@ export function MarkdownRenderer({ content }: MarkdownRendererProps) {
           if (inline) {
             return (
               <code
-                className="bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded text-sm font-mono text-gray-800 dark:text-gray-200"
+                className="px-1.5 py-0.5 rounded text-sm font-mono"
+                style={{
+                  backgroundColor: 'var(--color-code-bg)',
+                  color: 'var(--color-code-text)',
+                }}
                 {...props}
               >
                 {children}
