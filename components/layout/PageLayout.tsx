@@ -1,12 +1,14 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import { NavigationItem } from '@/lib/payload/types';
 import { Sidebar } from './Sidebar';
 import { MobileMenu } from './MobileMenu';
 import { TabBar } from './TabBar';
 import { Breadcrumb } from './Breadcrumb';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { useTabStore } from '@/lib/store/tabStore';
 
 /**
  * Props for the PageLayout component
@@ -45,6 +47,8 @@ interface PageLayoutProps {
  */
 export function PageLayout({ navigation, children }: PageLayoutProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
+  const { tabs, activeTabId, addTab, updateTabPath, hasHydrated } = useTabStore();
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -53,6 +57,95 @@ export function PageLayout({ navigation, children }: PageLayoutProps) {
   const closeMobileMenu = () => {
     setIsMobileMenuOpen(false);
   };
+
+  // Helper function to find navigation item by path
+  const findNavigationItemByPath = (
+    items: NavigationItem[],
+    path: string,
+  ): NavigationItem | null => {
+    // Normalize path by removing trailing slash
+    const normalizedPath = path.replace(/\/$/, '');
+
+    for (const item of items) {
+      // Skip items without a path (category items)
+      if (!item.path) {
+        // Still search in children
+        if (item.children) {
+          const found = findNavigationItemByPath(item.children, path);
+          if (found) return found;
+        }
+        continue;
+      }
+
+      // Normalize item path
+      const normalizedItemPath = item.path.replace(/\/$/, '');
+      if (normalizedItemPath === normalizedPath) {
+        return item;
+      }
+
+      // Search in children
+      if (item.children) {
+        const found = findNavigationItemByPath(item.children, path);
+        if (found) return found;
+      }
+    }
+    return null;
+  };
+
+  // Ensure a tab exists for the current URL
+  useEffect(() => {
+    // Wait for hydration to complete
+    if (!hasHydrated) return;
+
+    // Normalize path by removing leading slash and trailing slash
+    const currentPath = pathname === '/' ? '' : pathname.slice(1).replace(/\/$/, '');
+    const navItem = findNavigationItemByPath(navigation, currentPath);
+    // Use "Home" for root path, otherwise use nav item name or "New Tab"
+    const title = currentPath === '' ? 'Home' : navItem?.name || 'New Tab';
+
+    console.log('🔍 PageLayout useEffect:', {
+      currentPath,
+      navItem,
+      title,
+      tabsCount: tabs.length,
+      activeTabId,
+      tabs: tabs.map((t) => ({ id: t.id, title: t.title, path: t.path })),
+    });
+
+    // If no tabs exist, create one for the current path
+    if (tabs.length === 0) {
+      console.log('✅ Creating new tab:', { title, path: currentPath });
+      addTab({ title, path: currentPath });
+      return;
+    }
+
+    // Check if any tab matches the current path
+    const matchingTab = tabs.find((tab) => tab.path === currentPath);
+
+    if (matchingTab) {
+      console.log('📍 Found matching tab:', matchingTab);
+      // Tab exists for this path, update its title if it's "New Tab"
+      if (matchingTab.title === 'New Tab' && navItem) {
+        console.log('🔄 Updating tab title from "New Tab" to:', title);
+        updateTabPath(matchingTab.id, currentPath, title);
+      }
+    } else {
+      console.log('❌ No matching tab, updating active or first tab');
+      // No matching tab found, update the active tab
+      if (activeTabId) {
+        console.log('🔄 Updating active tab:', activeTabId);
+        updateTabPath(activeTabId, currentPath, title);
+      } else if (tabs.length > 0) {
+        console.log('🔄 Updating first tab:', tabs[0].id);
+        // No active tab but tabs exist, update the first tab
+        updateTabPath(tabs[0].id, currentPath, title);
+      } else {
+        console.log('✅ Creating fallback tab');
+        // Fallback: create a new tab
+        addTab({ title, path: currentPath });
+      }
+    }
+  }, [pathname, tabs, activeTabId, addTab, updateTabPath, navigation, hasHydrated]);
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950">
