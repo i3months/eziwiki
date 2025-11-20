@@ -83,7 +83,13 @@ export const useTabStore = create<TabStore>()(
       },
 
       setActiveTab: (id) => {
-        set({ activeTabId: id });
+        const { tabs } = get();
+        const tab = tabs.find((t) => t.id === id);
+
+        // Only update if the tab exists
+        if (tab) {
+          set({ activeTabId: id });
+        }
       },
 
       updateTabPath: (id, path, title) => {
