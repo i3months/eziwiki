@@ -100,8 +100,8 @@ export function PageLayout({ navigation, children }: PageLayoutProps) {
     // Normalize path by removing leading slash and trailing slash
     const currentPath = pathname === '/' ? '' : pathname.slice(1).replace(/\/$/, '');
     const navItem = findNavigationItemByPath(navigation, currentPath);
-    // Use "Home" for root path, otherwise use nav item name or "New Tab"
-    const title = currentPath === '' ? 'Home' : navItem?.name || 'New Tab';
+    // Use nav item name if found, otherwise "New Tab"
+    const title = navItem?.name || 'New Tab';
 
     console.log('🔍 PageLayout useEffect:', {
       currentPath,
