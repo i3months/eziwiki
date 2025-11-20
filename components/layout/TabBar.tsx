@@ -15,11 +15,14 @@ export function TabBar() {
     removeTab,
     closeOtherTabs,
     closeTabsToRight,
+    reorderTabs,
     hasHydrated,
   } = useTabStore();
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number; tabId: string } | null>(
     null,
   );
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const tabBarRef = useRef<HTMLDivElement>(null);
 
   const handleNewTab = () => {
@@ -71,6 +74,45 @@ export function TabBar() {
     setContextMenu(null);
   };
 
+  const handleDragStart = (e: React.DragEvent, index: number) => {
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+    // Set a transparent drag image for better UX
+    if (e.dataTransfer.setDragImage) {
+      const dragImage = document.createElement('div');
+      dragImage.style.opacity = '0';
+      document.body.appendChild(dragImage);
+      e.dataTransfer.setDragImage(dragImage, 0, 0);
+      setTimeout(() => document.body.removeChild(dragImage), 0);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    if (draggedIndex !== null && draggedIndex !== index) {
+      setDragOverIndex(index);
+    }
+  };
+
+  const handleDragLeave = () => {
+    setDragOverIndex(null);
+  };
+
+  const handleDrop = (e: React.DragEvent, dropIndex: number) => {
+    e.preventDefault();
+    if (draggedIndex !== null && draggedIndex !== dropIndex) {
+      reorderTabs(draggedIndex, dropIndex);
+    }
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+  };
+
   // Detect clicks outside context menu
   React.useEffect(() => {
     if (contextMenu) {
@@ -90,22 +132,32 @@ export function TabBar() {
       className="flex items-center gap-1 bg-gray-100 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 overflow-x-auto px-2 py-1"
       style={{ scrollbarWidth: 'thin' }}
     >
-      {tabs.map((tab) => {
+      {tabs.map((tab, index) => {
         const isActive = tab.id === activeTabId;
+        const isDragging = draggedIndex === index;
+        const isDragOver = dragOverIndex === index;
 
         return (
           <div
             key={tab.id}
+            draggable
+            onDragStart={(e) => handleDragStart(e, index)}
+            onDragOver={(e) => handleDragOver(e, index)}
+            onDragLeave={handleDragLeave}
+            onDrop={(e) => handleDrop(e, index)}
+            onDragEnd={handleDragEnd}
             onClick={() => handleTabClick(tab.id, tab.path)}
             onContextMenu={(e) => handleContextMenu(e, tab.id)}
             className={`
                 group flex items-center gap-2 px-3 py-1.5 rounded-md cursor-pointer
-                transition-colors w-[180px] flex-shrink-0
+                transition-all w-[180px] flex-shrink-0
                 ${
                   isActive
                     ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm'
                     : 'bg-gray-50 dark:bg-gray-800/50 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
                 }
+                ${isDragging ? 'opacity-50' : 'opacity-100'}
+                ${isDragOver ? 'border-l-2 border-blue-500' : ''}
               `}
           >
             <span className="flex-1 truncate text-sm font-medium min-w-0">{tab.title}</span>

@@ -22,6 +22,7 @@ interface TabStore {
   updateTabScroll: (id: string, scrollPosition: number) => void;
   closeOtherTabs: (id: string) => void;
   closeTabsToRight: (id: string) => void;
+  reorderTabs: (fromIndex: number, toIndex: number) => void;
   setSidebarWidth: (width: number) => void;
   setSidebarCollapsed: (collapsed: boolean) => void;
 }
@@ -117,6 +118,15 @@ export const useTabStore = create<TabStore>()(
           return {
             tabs: state.tabs.slice(0, index + 1),
           };
+        });
+      },
+
+      reorderTabs: (fromIndex, toIndex) => {
+        set((state) => {
+          const newTabs = [...state.tabs];
+          const [movedTab] = newTabs.splice(fromIndex, 1);
+          newTabs.splice(toIndex, 0, movedTab);
+          return { tabs: newTabs };
         });
       },
 
