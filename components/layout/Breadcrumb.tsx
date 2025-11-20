@@ -17,20 +17,14 @@ function buildBreadcrumbTrail(
   targetPath: string,
   trail: Array<{ name: string; path?: string }> = [],
 ): Array<{ name: string; path?: string }> | null {
-  console.log('buildBreadcrumbTrail called with:', { items, targetPath, trail });
-
   for (const item of items) {
-    console.log('Checking item:', item.name, 'path:', item.path, 'vs target:', targetPath);
-
     // Found the target
     if (item.path === targetPath) {
-      console.log('FOUND! Returning trail');
       return [...trail, { name: item.name, path: item.path }];
     }
 
     // Search in children - include parent in trail only if it has children
     if (item.children) {
-      console.log('Has children, searching deeper...');
       const found = buildBreadcrumbTrail(item.children, targetPath, [
         ...trail,
         { name: item.name, path: item.path },
@@ -39,7 +33,6 @@ function buildBreadcrumbTrail(
     }
   }
 
-  console.log('Not found in this level');
   return null;
 }
 
@@ -50,12 +43,6 @@ export function Breadcrumb({ navigation }: BreadcrumbProps) {
   let currentPath = pathname.startsWith('/') ? pathname.slice(1) : pathname;
   currentPath = currentPath.endsWith('/') ? currentPath.slice(0, -1) : currentPath;
 
-  console.log('Breadcrumb Debug:', {
-    pathname,
-    currentPath,
-    navigation,
-  });
-
   // Home page - don't show breadcrumb
   if (!currentPath) {
     return null;
@@ -63,8 +50,6 @@ export function Breadcrumb({ navigation }: BreadcrumbProps) {
 
   // Build breadcrumb trail from navigation structure
   const trail = buildBreadcrumbTrail(navigation, currentPath);
-
-  console.log('Trail found:', trail);
 
   // If no trail found, don't show breadcrumb
   if (!trail || trail.length === 0) {
