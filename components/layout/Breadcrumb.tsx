@@ -57,12 +57,12 @@ export function Breadcrumb({ navigation }: BreadcrumbProps) {
   }
 
   return (
-    <nav className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 px-4 py-2 bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-800">
+    <nav className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
       {trail.map((item, index) => (
         <React.Fragment key={index}>
           {index > 0 && (
             <svg
-              className="w-4 h-4 flex-shrink-0"
+              className="w-3.5 h-3.5 flex-shrink-0"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"

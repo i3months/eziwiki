@@ -6,7 +6,6 @@ import { Sidebar } from './Sidebar';
 import { MobileMenu } from './MobileMenu';
 import { TabBar } from './TabBar';
 import { NavigationButtons } from './NavigationButtons';
-import { Breadcrumb } from './Breadcrumb';
 import { ThemeToggle } from '@/components/ThemeToggle';
 
 /**
@@ -93,8 +92,7 @@ export function PageLayout({ navigation, children }: PageLayoutProps) {
           {/* Tab bar and navigation - fixed at top */}
           <div className="sticky top-0 z-20 bg-white dark:bg-gray-950">
             <TabBar />
-            <NavigationButtons />
-            <Breadcrumb navigation={navigation} />
+            <NavigationButtons navigation={navigation} />
           </div>
 
           {/* Content - scrollable */}
