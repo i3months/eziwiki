@@ -158,10 +158,12 @@ export const useTabStore = create<TabStore>()(
         const { tabs } = get();
         const tab = tabs.find((t) => t.id === id);
 
-        if (!tab || tab.historyIndex <= 0) return null;
+        if (!tab || !tab.history || tab.historyIndex <= 0) return null;
 
         const newIndex = tab.historyIndex - 1;
         const newEntry = tab.history[newIndex];
+
+        if (!newEntry) return null;
 
         set((state) => ({
           tabs: state.tabs.map((t) =>
@@ -178,10 +180,12 @@ export const useTabStore = create<TabStore>()(
         const { tabs } = get();
         const tab = tabs.find((t) => t.id === id);
 
-        if (!tab || tab.historyIndex >= tab.history.length - 1) return null;
+        if (!tab || !tab.history || tab.historyIndex >= tab.history.length - 1) return null;
 
         const newIndex = tab.historyIndex + 1;
         const newEntry = tab.history[newIndex];
+
+        if (!newEntry) return null;
 
         set((state) => ({
           tabs: state.tabs.map((t) =>
@@ -197,22 +201,24 @@ export const useTabStore = create<TabStore>()(
       canGoBack: (id) => {
         const { tabs } = get();
         const tab = tabs.find((t) => t.id === id);
-        return tab ? tab.historyIndex > 0 : false;
+        return tab && tab.history ? tab.historyIndex > 0 : false;
       },
 
       canGoForward: (id) => {
         const { tabs } = get();
         const tab = tabs.find((t) => t.id === id);
-        return tab ? tab.historyIndex < tab.history.length - 1 : false;
+        return tab && tab.history ? tab.historyIndex < tab.history.length - 1 : false;
       },
 
       updateTabHistoryIndex: (id, index) => {
         const { tabs } = get();
         const tab = tabs.find((t) => t.id === id);
 
-        if (!tab || index < 0 || index >= tab.history.length) return;
+        if (!tab || !tab.history || index < 0 || index >= tab.history.length) return;
 
         const entry = tab.history[index];
+
+        if (!entry) return;
 
         set((state) => ({
           tabs: state.tabs.map((t) =>
