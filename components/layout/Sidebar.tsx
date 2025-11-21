@@ -308,7 +308,7 @@ export function Sidebar({ navigation }: SidebarProps) {
                 className="flex-1 bg-transparent text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 outline-none min-w-0"
               />
             </div>
-            <ThemeToggle />
+            <ThemeToggle className="w-4 h-4" />
             <button
               onClick={handleToggle}
               className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-md transition-colors flex-shrink-0"
