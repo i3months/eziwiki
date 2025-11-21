@@ -43,7 +43,7 @@ interface MobileNavigationItemProps {
 function MobileNavigationItem({ item, currentPath, level, onNavigate }: MobileNavigationItemProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const router = useRouter();
-  const { activeTabId, tabs, updateTabPath, addTab } = useTabStore();
+  const { activeTabId, tabs, addTab } = useTabStore();
   const hasChildren = item.children && item.children.length > 0;
   const isActive = item.path === currentPath;
   const indentClass = level > 0 ? `pl-${level * 4}` : '';
@@ -57,10 +57,11 @@ function MobileNavigationItem({ item, currentPath, level, onNavigate }: MobileNa
   const handleLinkClick = (e: React.MouseEvent) => {
     if (item.path) {
       e.preventDefault();
+      const { navigateInHistory } = useTabStore.getState();
 
       if (activeTabId) {
-        // Update only the active tab's path
-        updateTabPath(activeTabId, item.path, item.name);
+        // Add to history and update the active tab's path
+        navigateInHistory(activeTabId, item.path, item.name);
       } else if (tabs.length === 0) {
         // No tabs at all, create a new one
         addTab({ title: item.name, path: item.path });

@@ -3,6 +3,7 @@ import './globals.css';
 import '@/styles/theme.css';
 import 'katex/dist/katex.min.css';
 import { PageLayout } from '@/components/layout/PageLayout';
+import { TabInitializer } from '@/components/layout/TabInitializer';
 import { payload } from '@/payload/config';
 import { validatePayload } from '@/lib/payload/validator';
 
@@ -35,6 +36,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body>
+        <TabInitializer navigation={payload.navigation} />
         <PageLayout navigation={payload.navigation}>{children}</PageLayout>
       </body>
     </html>
