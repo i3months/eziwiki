@@ -274,14 +274,15 @@ export const useTabStore = create<TabStore>()(
         sidebarCollapsed: state.sidebarCollapsed,
       }),
       // Migrate old tabs without history
-      migrate: (persistedState: any) => {
-        if (persistedState?.tabs) {
-          persistedState.tabs = persistedState.tabs.map((tab: any) => {
+      migrate: (persistedState: unknown) => {
+        const state = persistedState as Record<string, unknown>;
+        if (state?.tabs && Array.isArray(state.tabs)) {
+          state.tabs = state.tabs.map((tab: Record<string, unknown>) => {
             // Handle old format (string array) or missing history
             let history = tab.history;
             if (!history) {
               history = [{ path: tab.path || '', title: tab.title || 'New Tab' }];
-            } else if (typeof history[0] === 'string') {
+            } else if (Array.isArray(history) && typeof history[0] === 'string') {
               // Migrate from old string array format to new object format
               history = history.map((path: string) => ({
                 path,
@@ -296,7 +297,7 @@ export const useTabStore = create<TabStore>()(
             };
           });
         }
-        return persistedState;
+        return state;
       },
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);
