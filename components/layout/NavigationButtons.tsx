@@ -40,7 +40,7 @@ export function NavigationButtons({ navigation }: NavigationButtonsProps) {
   };
 
   return (
-    <div className="flex items-center gap-2 px-2 py-1.5 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950">
+    <div className="flex items-center gap-2 px-2 py-1.5 border-b border-gray-200 dark:border-gray-800 h-9 md:h-auto bg-white dark:bg-gray-950">
       {/* Navigation buttons - left side */}
       <div className="flex items-center gap-1">
         <button

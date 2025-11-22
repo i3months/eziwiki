@@ -199,7 +199,7 @@ export function TabBar() {
               }}
               className={`
                 group flex items-center gap-3 px-3 py-1.5 rounded-md
-                transition-all duration-150 w-[180px] flex-shrink-0 relative h-8
+                transition-all duration-150 w-[180px] flex-shrink-0 relative h-8 md:h-auto
                 ${
                   isActive
                     ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm'
