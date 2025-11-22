@@ -85,7 +85,7 @@ function NavigationItemComponent({
   const isLight = bgColor ? isLightColor(bgColor) : true;
 
   // Get text colors based on background
-  const textColor = isLight ? 'rgb(31, 41, 55)' : 'rgb(243, 244, 246)'; // gray-800 : gray-100
+  const textColor = isLight ? 'rgb(55, 65, 81)' : 'rgb(243, 244, 246)'; // gray-700 : gray-100
   const lineColor = isLight ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255, 255, 255, 0.3)';
 
   // Adjust opacity for dark mode
@@ -180,7 +180,7 @@ function NavigationItemComponent({
                 isActive
                   ? 'bg-blue-100 dark:bg-blue-900 text-blue-900 dark:text-blue-100 font-medium'
                   : !bgColor
-                    ? 'text-gray-700 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/10 active:bg-black/10 dark:active:bg-white/20'
+                    ? 'text-gray-600 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/10 active:bg-black/10 dark:active:bg-white/20'
                     : ''
               } ${!hasChildren ? 'ml-5' : ''}`}
               style={bgColor && !isActive ? { color: textColor } : undefined}
