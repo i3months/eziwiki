@@ -198,7 +198,7 @@ export function TabBar() {
                 cursor: isDragging ? 'grabbing' : 'grab',
               }}
               className={`
-                group flex items-center gap-2 px-3 py-1.5 rounded-md
+                group flex items-center gap-3 px-3 py-1.5 rounded-md
                 transition-all duration-150 w-[180px] flex-shrink-0 relative h-8
                 ${
                   isActive
@@ -208,24 +208,23 @@ export function TabBar() {
                 ${isDragging ? 'opacity-20' : 'opacity-100'}
               `}
             >
-              <span className="flex-1 truncate text-sm font-medium min-w-0 pointer-events-none select-none">
+              <span className="flex-1 truncate text-sm font-medium min-w-0 pointer-events-none select-none pr-2">
                 {tab.title}
               </span>
               <button
                 onClick={(e) => handleTabClose(e, tab.id)}
-                style={{ cursor: 'pointer' }}
                 className={`
-                  flex-shrink-0 p-0.5 rounded hover:bg-gray-200 dark:hover:bg-gray-600
+                  flex-shrink-0 w-5 h-5 min-w-[20px] min-h-[20px] flex items-center justify-center rounded hover:bg-gray-200 dark:hover:bg-gray-600
                   transition-opacity
                   ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}
                 `}
                 aria-label="Close tab"
               >
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    strokeWidth={2}
+                    strokeWidth={2.5}
                     d="M6 18L18 6M6 6l12 12"
                   />
                 </svg>
