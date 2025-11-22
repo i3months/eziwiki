@@ -169,7 +169,7 @@ export function TabBar() {
   return (
     <div
       ref={tabBarRef}
-      className="flex items-center gap-1 bg-gray-100 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 overflow-x-auto px-2 py-1 h-8 md:h-auto"
+      className="flex items-center gap-1 bg-gray-100 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 overflow-x-auto px-2 py-1 h-9 md:h-auto"
       style={{ scrollbarWidth: 'thin' }}
     >
       {tabs.map((tab, index) => {
@@ -181,7 +181,7 @@ export function TabBar() {
           <div key={tab.id} className="relative flex items-center">
             {/* Drop indicator - before */}
             {showDropIndicator && dropPosition === 'before' && (
-              <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 w-0.5 h-8 bg-blue-500 rounded-full z-10 shadow-lg shadow-blue-500/50" />
+              <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 w-0.5 bg-blue-500 rounded-full z-10 shadow-lg shadow-blue-500/50" />
             )}
 
             <div
@@ -199,7 +199,7 @@ export function TabBar() {
               }}
               className={`
                 group flex items-center gap-2 px-3 py-1.5 rounded-md
-                transition-all duration-150 w-[180px] flex-shrink-0 relative
+                transition-all duration-150 w-[180px] flex-shrink-0 relative h-8
                 ${
                   isActive
                     ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm'
@@ -234,7 +234,7 @@ export function TabBar() {
 
             {/* Drop indicator - after */}
             {showDropIndicator && dropPosition === 'after' && (
-              <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1 w-0.5 h-8 bg-blue-500 rounded-full z-10 shadow-lg shadow-blue-500/50" />
+              <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1 w-0.5 bg-blue-500 rounded-full z-10 shadow-lg shadow-blue-500/50" />
             )}
           </div>
         );
