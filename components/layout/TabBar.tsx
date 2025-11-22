@@ -169,7 +169,7 @@ export function TabBar() {
   return (
     <div
       ref={tabBarRef}
-      className="flex items-center gap-1 bg-gray-100 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 overflow-x-auto px-2 py-1"
+      className="flex items-center gap-1 bg-gray-100 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 overflow-x-auto px-2 py-1 h-8 md:h-auto"
       style={{ scrollbarWidth: 'thin' }}
     >
       {tabs.map((tab, index) => {
