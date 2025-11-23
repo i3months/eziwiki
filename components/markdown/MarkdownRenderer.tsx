@@ -2,6 +2,8 @@ import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import { remarkPlugins, rehypePlugins } from '@/lib/markdown/plugins';
 import { CodeBlock } from '@/components/markdown/CodeBlock';
+import { resolvePathToHash } from '@/lib/navigation/hash';
+import { payload } from '@/payload/config';
 
 /**
  * Props for the MarkdownRenderer component
@@ -97,16 +99,32 @@ export function MarkdownRenderer({ content }: MarkdownRendererProps) {
         li: ({ children }) => (
           <li className="leading-snug mb-1 [&>p]:mb-0 [&>p]:leading-snug">{children}</li>
         ),
-        a: ({ href, children }) => (
-          <a
-            href={href}
-            className="text-blue-600 dark:text-blue-400 hover:underline"
-            target={href?.startsWith('http') ? '_blank' : undefined}
-            rel={href?.startsWith('http') ? 'noopener noreferrer' : undefined}
-          >
-            {children}
-          </a>
-        ),
+        a: ({ href, children }) => {
+          // Convert internal links to hash-based URLs
+          let finalHref = href;
+
+          if (href && !href.startsWith('http') && !href.startsWith('#')) {
+            // Remove leading slash if present
+            const cleanPath = href.startsWith('/') ? href.slice(1) : href;
+
+            // Try to resolve to hash URL
+            const hash = resolvePathToHash(cleanPath, payload.navigation);
+            if (hash) {
+              finalHref = `/${hash}`;
+            }
+          }
+
+          return (
+            <a
+              href={finalHref}
+              className="text-blue-600 dark:text-blue-400 hover:underline"
+              target={href?.startsWith('http') ? '_blank' : undefined}
+              rel={href?.startsWith('http') ? 'noopener noreferrer' : undefined}
+            >
+              {children}
+            </a>
+          );
+        },
         blockquote: ({ children }) => (
           <blockquote className="border-l-4 border-gray-300 dark:border-gray-600 pl-4 italic my-4 text-sm sm:text-base lg:text-lg text-gray-600 dark:text-gray-400">
             {children}
