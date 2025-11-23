@@ -2,6 +2,7 @@ import { parseMarkdownFile } from '@/lib/markdown/parser';
 import { MarkdownRenderer } from '@/components/markdown/MarkdownRenderer';
 import { MarkdownSkeleton } from '@/components/markdown/MarkdownSkeleton';
 import { extractAllPaths } from '@/lib/navigation/builder';
+import { generatePathHash, resolveHashToPath } from '@/lib/navigation/hash';
 import { payload } from '@/payload/config';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
@@ -18,7 +19,17 @@ interface PageProps {
  */
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = params;
-  const path = slug.join('/');
+  const hash = slug.join('/');
+
+  // Resolve hash to actual path
+  const path = resolveHashToPath(hash, payload.navigation);
+
+  if (!path) {
+    return {
+      title: payload.global.title,
+      description: payload.global.description,
+    };
+  }
 
   try {
     const { frontmatter } = await parseMarkdownFile(path);
@@ -44,7 +55,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 /**
- * Generate static params for all navigation paths
+ * Generate static params for all navigation paths using hash-based URLs
  * This enables static site generation for all content pages
  */
 export async function generateStaticParams() {
@@ -66,10 +77,13 @@ export async function generateStaticParams() {
     }
   }
 
-  // Convert paths to slug arrays for Next.js
-  return validPaths.map((path) => ({
-    slug: path.split('/'),
-  }));
+  // Convert paths to hash-based slug arrays for Next.js
+  return validPaths.map((path) => {
+    const hash = generatePathHash(path);
+    return {
+      slug: hash.split('/'),
+    };
+  });
 }
 
 /**
@@ -86,11 +100,18 @@ async function MarkdownContent({ path }: { path: string }) {
 
 /**
  * Dynamic content page component
- * Renders Markdown content based on the URL slug
+ * Renders Markdown content based on the hash-based URL slug
  */
 export default async function ContentPage({ params }: PageProps) {
   const { slug } = params;
-  const path = slug.join('/');
+  const hash = slug.join('/');
+
+  // Resolve hash to actual file path
+  const path = resolveHashToPath(hash, payload.navigation);
+
+  if (!path) {
+    notFound();
+  }
 
   return (
     <article className="prose prose-slate max-w-none dark:prose-invert">

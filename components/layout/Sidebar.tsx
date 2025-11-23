@@ -7,6 +7,8 @@ import { ChevronRight, ChevronsLeft, ChevronsRight, Search } from 'lucide-react'
 import { NavigationItem } from '@/lib/payload/types';
 import { useTabStore } from '@/lib/store/tabStore';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { resolvePathToHash } from '@/lib/navigation/hash';
+import { filterHiddenItems } from '@/lib/navigation/builder';
 
 /**
  * Props for the Sidebar component
@@ -30,6 +32,8 @@ interface NavigationItemComponentProps {
   parentLines?: boolean[];
   /** Background color inherited from parent */
   backgroundColor?: string;
+  /** Full navigation tree for hash resolution */
+  navigation: NavigationItem[];
 }
 
 /**
@@ -72,6 +76,7 @@ function NavigationItemComponent({
   level,
   parentLines = [],
   backgroundColor,
+  navigation,
 }: NavigationItemComponentProps) {
   const [isExpanded, setIsExpanded] = useState(true);
   const router = useRouter();
@@ -112,7 +117,7 @@ function NavigationItemComponent({
     }
   };
 
-  const handleLinkClick = (e: React.MouseEvent) => {
+  const handleLinkClick = (e: React.MouseEvent, navigation: NavigationItem[]) => {
     if (item.path) {
       e.preventDefault();
       const { tabs, addTab: storeAddTab, navigateInHistory } = useTabStore.getState();
@@ -128,7 +133,10 @@ function NavigationItemComponent({
         const firstTab = tabs[0];
         navigateInHistory(firstTab.id, item.path, item.name);
       }
-      router.replace(`/${item.path}`);
+
+      // Convert path to hash for URL
+      const hash = resolvePathToHash(item.path, navigation);
+      router.replace(`/${hash}`);
     }
   };
 
@@ -175,8 +183,8 @@ function NavigationItemComponent({
           )}
           {item.path ? (
             <Link
-              href={`/${item.path}`}
-              onClick={handleLinkClick}
+              href={`/${resolvePathToHash(item.path, navigation)}`}
+              onClick={(e) => handleLinkClick(e, navigation)}
               className={`flex-1 px-2 py-1 rounded-md text-sm transition-colors touch-manipulation ${
                 isActive
                   ? 'bg-blue-100 dark:bg-blue-900 text-blue-900 dark:text-blue-100 font-medium'
@@ -222,6 +230,7 @@ function NavigationItemComponent({
                 level={level + 1}
                 parentLines={newParentLines}
                 backgroundColor={bgColor}
+                navigation={navigation}
               />
             );
           })}
@@ -263,6 +272,9 @@ export function Sidebar({ navigation }: SidebarProps) {
   const pathname = usePathname();
   const currentPath = pathname === '/' ? '' : pathname.slice(1);
   const { sidebarWidth, sidebarCollapsed, setSidebarWidth, setSidebarCollapsed } = useTabStore();
+
+  // Filter out hidden items
+  const visibleNavigation = filterHiddenItems(navigation);
 
   const sidebarRef = useRef<HTMLDivElement>(null);
   const [isResizing, setIsResizing] = useState(false);
@@ -347,7 +359,7 @@ export function Sidebar({ navigation }: SidebarProps) {
     }, []);
   };
 
-  const filteredNavigation = filterNavigation(navigation, searchQuery);
+  const filteredNavigation = filterNavigation(visibleNavigation, searchQuery);
 
   return (
     <aside
@@ -405,6 +417,7 @@ export function Sidebar({ navigation }: SidebarProps) {
                   currentPath={currentPath}
                   level={0}
                   parentLines={[]}
+                  navigation={navigation}
                 />
               </div>
             ))

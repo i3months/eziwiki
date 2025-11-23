@@ -4,6 +4,8 @@ import React, { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTabStore } from '@/lib/store/tabStore';
 import { TabBarSkeleton } from './TabBarSkeleton';
+import { resolvePathToHash } from '@/lib/navigation/hash';
+import { payload } from '@/payload/config';
 
 export function TabBar() {
   const router = useRouter();
@@ -34,8 +36,9 @@ export function TabBar() {
 
   const handleTabClick = (tabId: string, path: string) => {
     setActiveTab(tabId);
-    // Navigate to the tab's current path
-    router.replace(`/${path}`);
+    // Navigate to the tab's current path (convert to hash)
+    const hash = path ? resolvePathToHash(path, payload.navigation) : '';
+    router.replace(`/${hash}`);
   };
 
   const closeTab = (tabId: string) => {
@@ -57,7 +60,10 @@ export function TabBar() {
         const newActiveTab = remainingTabs[Math.min(index, remainingTabs.length - 1)];
         if (newActiveTab) {
           // Use replace to avoid polluting history when closing tabs
-          router.replace(`/${newActiveTab.path}`);
+          const hash = newActiveTab.path
+            ? resolvePathToHash(newActiveTab.path, payload.navigation)
+            : '';
+          router.replace(`/${hash}`);
         }
       }
     }
