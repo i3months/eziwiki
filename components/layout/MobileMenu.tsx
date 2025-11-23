@@ -66,7 +66,14 @@ function MobileNavigationItem({
   const { activeTabId, tabs, addTab } = useTabStore();
   const hasChildren = item.children && item.children.length > 0;
   const isActive = item.path === currentPath;
-  const indentClass = level > 0 ? `pl-${level * 4}` : '';
+
+  // Calculate left margin based on level using inline styles
+  const getLeftMarginStyle = () => {
+    if (level === 0) return {};
+    const baseMargin = level * 24; // 24px per level
+    const extraMargin = hasChildren ? 0 : 4; // Extra 4px for documents
+    return { marginLeft: `${baseMargin + extraMargin}px` };
+  };
 
   // Use item's color if defined, otherwise inherit from parent
   const bgColor = item.color || backgroundColor;
@@ -113,10 +120,7 @@ function MobileNavigationItem({
 
   return (
     <div className={level === 0 ? 'mb-0.5' : ''} style={level === 0 ? getBgStyle(true) : undefined}>
-      <div
-        className={`flex items-center ${indentClass}`}
-        style={level > 0 ? getBgStyle(false) : undefined}
-      >
+      <div className="flex items-center" style={level > 0 ? getBgStyle(false) : undefined}>
         {hasChildren ? (
           // Folder with children - entire area is clickable to toggle
           <button
@@ -126,12 +130,12 @@ function MobileNavigationItem({
                 ? 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 active:bg-gray-200 dark:active:bg-gray-700'
                 : ''
             }`}
-            style={bgColor ? { color: textColor } : undefined}
+            style={bgColor ? { color: textColor, ...getLeftMarginStyle() } : getLeftMarginStyle()}
             aria-label={isExpanded ? 'Collapse' : 'Expand'}
             aria-expanded={isExpanded}
           >
             <svg
-              className={`w-4 h-4 mr-2 -ml-1 transition-transform duration-[120ms] ${isExpanded ? 'rotate-90' : ''}`}
+              className={`w-4 h-4 mr-2 -ml-1 flex-shrink-0 transition-transform duration-[120ms] ${isExpanded ? 'rotate-90' : ''}`}
               style={{ transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)' }}
               fill="none"
               stroke="currentColor"
@@ -149,14 +153,18 @@ function MobileNavigationItem({
           <Link
             href={`/${item.path}`}
             onClick={handleLinkClick}
-            className={`flex-1 px-2 py-1 ml-6 rounded-md text-sm transition-colors touch-manipulation ${
+            className={`flex-1 px-2 py-1 rounded-md text-sm transition-colors touch-manipulation ${
               isActive
                 ? 'bg-blue-100 dark:bg-blue-900 text-blue-900 dark:text-blue-100 font-medium'
                 : !bgColor
                   ? 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 active:bg-gray-200 dark:active:bg-gray-700'
                   : ''
             }`}
-            style={bgColor && !isActive ? { color: textColor } : undefined}
+            style={
+              bgColor && !isActive
+                ? { color: textColor, ...getLeftMarginStyle() }
+                : getLeftMarginStyle()
+            }
           >
             {item.icon && <span className="mr-2">{item.icon}</span>}
             {item.name}
@@ -164,10 +172,10 @@ function MobileNavigationItem({
         ) : (
           // Item without path or children - static text
           <div
-            className={`flex-1 px-2 py-1 ml-6 text-sm font-semibold ${
+            className={`flex-1 px-2 py-1 text-sm font-semibold ${
               !bgColor ? 'text-gray-900 dark:text-gray-100' : ''
             }`}
-            style={bgColor ? { color: textColor } : undefined}
+            style={bgColor ? { color: textColor, ...getLeftMarginStyle() } : getLeftMarginStyle()}
           >
             {item.icon && <span className="mr-2">{item.icon}</span>}
             {item.name}
