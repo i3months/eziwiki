@@ -6,6 +6,7 @@ import { NavigationItem } from '../payload/types';
  * This function traverses the entire navigation hierarchy and collects
  * all path values, which are used to generate static pages at build time.
  * Items without a path property are skipped (they act as section headers).
+ * Hidden items are included in the extraction (they're just hidden from UI).
  *
  * @param items - Array of navigation items to process
  * @returns Flat array of all path strings found in the navigation tree
@@ -43,6 +44,35 @@ export function extractAllPaths(items: NavigationItem[]): string[] {
 
   traverse(items);
   return paths;
+}
+
+/**
+ * Filter out hidden navigation items
+ *
+ * Recursively removes items marked as hidden from the navigation tree.
+ * This is used to hide items from the sidebar while keeping them accessible via URL.
+ *
+ * @param items - Array of navigation items to filter
+ * @returns Filtered navigation tree without hidden items
+ *
+ * @example
+ * ```typescript
+ * const navigation = [
+ *   { name: 'Public', path: 'public' },
+ *   { name: 'Secret', path: 'secret', hidden: true }
+ * ];
+ *
+ * const visible = filterHiddenItems(navigation);
+ * // Returns: [{ name: 'Public', path: 'public' }]
+ * ```
+ */
+export function filterHiddenItems(items: NavigationItem[]): NavigationItem[] {
+  return items
+    .filter((item) => !item.hidden)
+    .map((item) => ({
+      ...item,
+      children: item.children ? filterHiddenItems(item.children) : undefined,
+    }));
 }
 
 /**
