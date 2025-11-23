@@ -37,11 +37,11 @@ export default function Error({ error, reset }: ErrorProps) {
         </div>
 
         <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-          Something went wrong
+          Oops! Something went wrong
         </h1>
 
-        <p className="text-gray-600 dark:text-gray-400 mb-2">
-          An error occurred while rendering this page.
+        <p className="text-gray-600 dark:text-gray-400 mb-6">
+          We encountered an unexpected error while loading this page.
         </p>
 
         {error.message && (
