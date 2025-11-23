@@ -9,7 +9,7 @@ export const payload: Payload = {
     title: 'Documentation Site',
     description:
       'A beautiful documentation site built with Next.js, inspired by Notion and Obsidian',
-    favicon: '/favicon.ico',
+    favicon: '/favicon.svg',
     baseUrl: 'https://i3months.com',
     seo: {
       openGraph: {
