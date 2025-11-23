@@ -6,6 +6,7 @@ import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useTabStore } from '@/lib/store/tabStore';
 import { NavigationItem } from '@/lib/payload/types';
 import { Breadcrumb } from './Breadcrumb';
+import { resolvePathToHash } from '@/lib/navigation/hash';
 
 interface NavigationButtonsProps {
   navigation: NavigationItem[];
@@ -26,7 +27,13 @@ export function NavigationButtons({ navigation }: NavigationButtonsProps) {
 
     const result = goBack(activeTabId);
     if (result) {
-      router.replace(`/${result.path}`);
+      // If path is empty, go to home
+      if (!result.path) {
+        router.replace('/');
+        return;
+      }
+      const hash = resolvePathToHash(result.path, navigation);
+      router.replace(`/${hash || ''}`);
     }
   };
 
@@ -35,7 +42,13 @@ export function NavigationButtons({ navigation }: NavigationButtonsProps) {
 
     const result = goForward(activeTabId);
     if (result) {
-      router.replace(`/${result.path}`);
+      // If path is empty, go to home
+      if (!result.path) {
+        router.replace('/');
+        return;
+      }
+      const hash = resolvePathToHash(result.path, navigation);
+      router.replace(`/${hash || ''}`);
     }
   };
 

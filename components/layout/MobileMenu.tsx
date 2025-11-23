@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { NavigationItem } from '@/lib/payload/types';
 import { useTabStore } from '@/lib/store/tabStore';
+import { resolvePathToHash } from '@/lib/navigation/hash';
+import { filterHiddenItems } from '@/lib/navigation/builder';
 
 /**
  * Props for the MobileMenu component
@@ -32,6 +34,8 @@ interface MobileNavigationItemProps {
   onNavigate: () => void;
   /** Background color inherited from parent */
   backgroundColor?: string;
+  /** Full navigation tree for hash resolution */
+  navigation: NavigationItem[];
 }
 
 /**
@@ -60,6 +64,7 @@ function MobileNavigationItem({
   level,
   onNavigate,
   backgroundColor,
+  navigation,
 }: MobileNavigationItemProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const router = useRouter();
@@ -112,8 +117,9 @@ function MobileNavigationItem({
         addTab({ title: item.name, path: item.path });
       }
 
-      // Navigate and close menu
-      router.replace(`/${item.path}`);
+      // Convert path to hash for URL
+      const hash = resolvePathToHash(item.path, navigation);
+      router.replace(`/${hash}`);
       onNavigate();
     }
   };
@@ -151,7 +157,7 @@ function MobileNavigationItem({
         ) : item.path ? (
           // Item with path - link
           <Link
-            href={`/${item.path}`}
+            href={`/${resolvePathToHash(item.path, navigation)}`}
             onClick={handleLinkClick}
             className={`flex-1 px-2 py-1 rounded-md text-sm transition-colors touch-manipulation ${
               isActive
@@ -199,6 +205,7 @@ function MobileNavigationItem({
               level={level + 1}
               onNavigate={onNavigate}
               backgroundColor={bgColor}
+              navigation={navigation}
             />
           ))}
         </div>
@@ -236,6 +243,9 @@ function MobileNavigationItem({
 export function MobileMenu({ navigation, isOpen, onClose }: MobileMenuProps) {
   const pathname = usePathname();
   const currentPath = pathname === '/' ? '' : pathname.slice(1);
+
+  // Filter out hidden items
+  const visibleNavigation = filterHiddenItems(navigation);
 
   // Prevent body scroll when menu is open
   useEffect(() => {
@@ -288,13 +298,14 @@ export function MobileMenu({ navigation, isOpen, onClose }: MobileMenuProps) {
                 </svg>
               </button>
             </div>
-            {navigation.map((item, index) => (
+            {visibleNavigation.map((item, index) => (
               <MobileNavigationItem
                 key={`${item.name}-${index}`}
                 item={item}
                 currentPath={currentPath}
                 level={0}
                 onNavigate={onClose}
+                navigation={navigation}
               />
             ))}
           </nav>

@@ -4,6 +4,7 @@ import React from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { NavigationItem } from '@/lib/payload/types';
+import { resolvePathToHash, resolveHashToPath } from '@/lib/navigation/hash';
 
 interface BreadcrumbProps {
   navigation: NavigationItem[];
@@ -40,10 +41,17 @@ export function Breadcrumb({ navigation }: BreadcrumbProps) {
   const pathname = usePathname();
 
   // Remove leading and trailing slashes
-  let currentPath = pathname.startsWith('/') ? pathname.slice(1) : pathname;
-  currentPath = currentPath.endsWith('/') ? currentPath.slice(0, -1) : currentPath;
+  let currentHash = pathname.startsWith('/') ? pathname.slice(1) : pathname;
+  currentHash = currentHash.endsWith('/') ? currentHash.slice(0, -1) : currentHash;
 
   // Home page - don't show breadcrumb
+  if (!currentHash) {
+    return null;
+  }
+
+  // Resolve hash to actual path
+  const currentPath = resolveHashToPath(currentHash, navigation);
+
   if (!currentPath) {
     return null;
   }
@@ -75,7 +83,7 @@ export function Breadcrumb({ navigation }: BreadcrumbProps) {
             <span className="font-medium text-gray-900 dark:text-gray-100">{item.name}</span>
           ) : (
             <Link
-              href={`/${item.path}`}
+              href={`/${resolvePathToHash(item.path, navigation)}`}
               className="hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
             >
               {item.name}
