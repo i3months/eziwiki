@@ -37,6 +37,11 @@ export const payload: Payload = {
       path: 'test-all-markdown',
     },
     {
+      name: 'Secret Page',
+      path: 'test-sample',
+      hidden: true,
+    },
+    {
       name: 'Empty Folder',
       children: [],
     },
