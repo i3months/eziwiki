@@ -150,7 +150,7 @@ function NavigationItemComponent({
               <div key={idx} className="relative" style={{ width: '20px' }}>
                 {showLine && (
                   <div
-                    className="absolute left-1/2 top-0 bottom-0 w-px"
+                    className={`absolute left-1/2 top-0 bottom-0 w-px ${!bgColor ? 'bg-gray-300 dark:bg-gray-700' : ''}`}
                     style={{ backgroundColor: bgColor ? lineColor : undefined }}
                   />
                 )}
