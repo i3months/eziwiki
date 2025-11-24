@@ -168,7 +168,7 @@ function NavigationItemComponent({
               onClick={handleToggle}
               className={`mr-1 p-1 rounded transition-colors touch-manipulation flex-shrink-0 ${
                 !bgColor
-                  ? 'text-gray-700 hover:text-gray-900 dark:text-gray-800 dark:hover:text-gray-600 hover:bg-black/5 dark:hover:bg-white/10'
+                  ? 'text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100 hover:bg-black/5 dark:hover:bg-white/10'
                   : ''
               }`}
               style={bgColor ? { color: textColor } : undefined}
