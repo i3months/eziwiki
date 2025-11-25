@@ -32,9 +32,3 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# Reference and spec files
-reference/
-spec.md
-.kiro/
-
-*.md
