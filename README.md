@@ -1,9 +1,6 @@
-<div align="center">
-  <img src="eziwiki.png" alt="EziWiki" width="600" />
-  
-  <p><strong>A modern, lightweight wiki and documentation generator built with Next.js 14</strong></p>
+![EziWiki](eziwiki.png)
 
-</div>
+A modern, lightweight wiki and documentation generator
 
 ## Introduction
 
