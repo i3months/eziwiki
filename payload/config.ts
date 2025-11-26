@@ -95,6 +95,10 @@ export const payload: Payload = {
           path: 'features/hash-navigation',
         },
         {
+          name: 'Hidden Pages',
+          path: 'features/hidden-pages',
+        },
+        {
           name: 'Dark Mode',
           path: 'features/dark-mode',
         },
@@ -143,6 +147,11 @@ export const payload: Payload = {
           path: 'examples/knowledge-base',
         },
       ],
+    },
+    {
+      name: 'Secret Demo Page',
+      path: 'secret-demo',
+      hidden: true,
     },
   ],
   theme: {
