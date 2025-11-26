@@ -40,6 +40,14 @@ export interface GlobalConfig {
         alt?: string;
       }>;
     };
+    twitter?: {
+      card?: 'summary' | 'summary_large_image' | 'app' | 'player';
+      site?: string;
+      creator?: string;
+      title?: string;
+      description?: string;
+      images?: string[];
+    };
   };
 }
 

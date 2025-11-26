@@ -25,6 +25,13 @@ export const payload: Payload = {
           },
         ],
       },
+      twitter: {
+        card: 'summary_large_image',
+        title: 'eziwiki - Beautiful Documentation Made Easy',
+        description:
+          'A beautiful, minimal wiki and documentation site generator inspired by Notion and Obsidian',
+        images: ['/og-image.svg'],
+      },
     },
   },
   navigation: [

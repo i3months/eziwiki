@@ -30,11 +30,37 @@ export const metadata: Metadata = {
         images: payload.global.seo.openGraph.images,
       }
     : undefined,
+  twitter: payload.global.seo?.twitter
+    ? {
+        card: payload.global.seo.twitter.card || 'summary_large_image',
+        site: payload.global.seo.twitter.site,
+        creator: payload.global.seo.twitter.creator,
+        title: payload.global.seo.twitter.title || payload.global.title,
+        description: payload.global.seo.twitter.description || payload.global.description,
+        images: payload.global.seo.twitter.images,
+      }
+    : undefined,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const baseUrl = payload.global.baseUrl || 'https://example.com';
+
   return (
     <html lang="en">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'WebSite',
+              name: payload.global.title,
+              description: payload.global.description,
+              url: baseUrl,
+            }),
+          }}
+        />
+      </head>
       <body>
         <TabInitializer navigation={payload.navigation} />
         <PageLayout navigation={payload.navigation}>{children}</PageLayout>

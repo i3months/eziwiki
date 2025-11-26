@@ -34,16 +34,32 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   try {
     const { frontmatter } = await parseMarkdownFile(path);
 
+    const title = (frontmatter.title as string) || payload.global.title;
+    const description = (frontmatter.description as string) || payload.global.description;
+    const ogImage = frontmatter.ogImage as string | undefined;
+    const baseUrl = payload.global.baseUrl || 'https://example.com';
+    const canonicalUrl = `${baseUrl}/${hash}`;
+
     return {
-      title: (frontmatter.title as string) || payload.global.title,
-      description: (frontmatter.description as string) || payload.global.description,
+      title,
+      description,
+      alternates: {
+        canonical: canonicalUrl,
+      },
       icons: {
         icon: (frontmatter.favicon as string) || payload.global.favicon || '/favicon.ico',
       },
       openGraph: {
-        title: (frontmatter.title as string) || payload.global.title,
-        description: (frontmatter.description as string) || payload.global.description,
-        images: frontmatter.ogImage ? [frontmatter.ogImage as string] : undefined,
+        title,
+        description,
+        url: canonicalUrl,
+        images: ogImage ? [ogImage] : undefined,
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title,
+        description,
+        images: ogImage ? [ogImage] : undefined,
       },
     };
   } catch {
@@ -89,10 +105,35 @@ export async function generateStaticParams() {
 /**
  * Content component that loads and renders markdown
  */
-async function MarkdownContent({ path }: { path: string }) {
+async function MarkdownContent({ path, hash }: { path: string; hash: string }) {
   try {
-    const { content } = await parseMarkdownFile(path);
-    return <MarkdownRenderer content={content} />;
+    const { content, frontmatter } = await parseMarkdownFile(path);
+    const baseUrl = payload.global.baseUrl || 'https://example.com';
+    const canonicalUrl = `${baseUrl}/${hash}`;
+
+    return (
+      <>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'Article',
+              headline: (frontmatter.title as string) || payload.global.title,
+              description: (frontmatter.description as string) || payload.global.description,
+              url: canonicalUrl,
+              datePublished: frontmatter.date || new Date().toISOString(),
+              dateModified: frontmatter.updated || frontmatter.date || new Date().toISOString(),
+              author: {
+                '@type': 'Organization',
+                name: payload.global.title,
+              },
+            }),
+          }}
+        />
+        <MarkdownRenderer content={content} />
+      </>
+    );
   } catch (error) {
     notFound();
   }
@@ -116,7 +157,7 @@ export default async function ContentPage({ params }: PageProps) {
   return (
     <article className="prose prose-slate max-w-none dark:prose-invert">
       <Suspense fallback={<MarkdownSkeleton />}>
-        <MarkdownContent path={path} />
+        <MarkdownContent path={path} hash={hash} />
       </Suspense>
     </article>
   );
