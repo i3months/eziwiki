@@ -1,103 +1,108 @@
 ---
-title: Introduction
-description: Welcome to the documentation site
+title: Welcome to eziwiki
+description: A beautiful, minimal wiki and documentation site generator
 ---
 
-# Welcome to Documentation Site
+# Welcome to eziwiki 👋
 
-This is a beautiful, minimal documentation site built with Next.js, inspired by Notion and Obsidian.
+![eziwiki](/images/eziwiki.png)
 
-## Features
+**eziwiki** is a beautiful, minimal wiki and documentation site generator built with Next.js 14, inspired by Notion and Obsidian.
 
-- **Static Site Generation**: All pages are pre-rendered at build time for optimal performance
-- **Markdown Support**: Write your content in Markdown with full GitHub Flavored Markdown support
-- **Syntax Highlighting**: Code blocks are automatically highlighted with language detection
-- **Responsive Design**: Works beautifully on mobile, tablet, and desktop devices
-- **Customizable Theme**: Easy theme customization with CSS variables
-- **Type-Safe**: Built with TypeScript for maximum reliability
+Perfect for creating documentation sites, personal wikis, knowledge bases, and more.
 
-## Getting Started
+## ✨ Key Features
 
-Check out the [Quick Start](/guides/quick-start) guide to begin using this template.
+- **🚀 Static Site Generation** - Lightning-fast pages pre-rendered at build time
+- **📝 Markdown-First** - Write content in Markdown with full GitHub Flavored Markdown support
+- **🎨 Beautiful UI** - Clean, modern interface inspired by Notion and Obsidian
+- **📱 Fully Responsive** - Works beautifully on mobile, tablet, and desktop
+- **🌙 Dark Mode** - Built-in dark mode support
+- **🎯 Type-Safe** - Built with TypeScript for maximum reliability
+- **🔍 Syntax Highlighting** - Powered by Shiki for beautiful code blocks
+- **⚡ Zero Config** - Works out of the box, customize when you need
+- **🔗 Smart Links** - Internal links automatically converted to hash-based navigation
+- **📂 Nested Navigation** - Unlimited nesting with collapsible sections
 
-## Code Examples
+## 🎯 Perfect For
 
-Here's a simple TypeScript example:
+- **Documentation Sites** - API docs, user guides, technical documentation
+- **Personal Wikis** - Your second brain, knowledge management
+- **Knowledge Bases** - Team wikis, internal documentation
+- **Project Documentation** - README on steroids
+- **Learning Notes** - Study materials, course notes
+
+## 🚀 Quick Start
+
+Get started in less than 5 minutes:
+
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/eziwiki.git
+cd eziwiki
+
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+```
+
+Visit [http://localhost:3000](http://localhost:3000) to see your wiki!
+
+## 📖 What's Next?
+
+- **[Installation Guide](/getting-started/installation)** - Detailed setup instructions
+- **[Quick Start](/getting-started/quick-start)** - Get up and running fast
+- **[Configuration](/configuration/payload)** - Customize your wiki
+- **[Writing Content](/content/markdown-basics)** - Learn Markdown basics
+- **[Deployment](/deployment/static-export)** - Deploy your wiki
+
+## 💡 Example
+
+Here's how easy it is to configure your wiki:
 
 ```typescript
-interface User {
-  name: string;
-  email: string;
-  role: 'admin' | 'user';
-}
-
-function greetUser(user: User): string {
-  return `Hello, ${user.name}!`;
-}
-
-const currentUser: User = {
-  name: 'Alice',
-  email: 'alice@example.com',
-  role: 'admin',
-};
-
-console.log(greetUser(currentUser));
-```
-
-Python example with syntax highlighting:
-
-```python
-def calculate_fibonacci(n: int) -> list[int]:
-    """Generate Fibonacci sequence up to n terms."""
-    if n <= 0:
-        return []
-    elif n == 1:
-        return [0]
-
-    fib = [0, 1]
-    for i in range(2, n):
-        fib.append(fib[i-1] + fib[i-2])
-
-    return fib
-
-# Generate first 10 Fibonacci numbers
-result = calculate_fibonacci(10)
-print(result)  # [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
-```
-
-JSON configuration example:
-
-```json
-{
-  "name": "my-project",
-  "version": "1.0.0",
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start"
+export const payload: Payload = {
+  global: {
+    title: 'My Wiki',
+    description: 'My personal knowledge base',
   },
-  "dependencies": {
-    "next": "^14.0.0",
-    "react": "^18.2.0"
-  }
-}
+  navigation: [
+    {
+      name: 'Getting Started',
+      path: 'intro',
+    },
+    {
+      name: 'Guides',
+      color: '#dbeafe',
+      children: [
+        {
+          name: 'Installation',
+          path: 'guides/installation',
+        },
+      ],
+    },
+  ],
+};
 ```
 
-## Next Steps
+That's it! Add your Markdown files and you're ready to go.
 
-- Read the [Quick Start Guide](/guides/quick-start) to set up your project
-- Learn about [Configuration](/guides/configuration) options
-- Explore the [API Reference](/api/overview) for detailed documentation
-- Check out [Advanced Deployment](/guides/advanced/deployment) strategies
-- Customize your theme colors
-- Add your own Markdown content
+## 🌟 Why eziwiki?
 
-## Internal Links
+- **Simple** - No complex setup, just write Markdown
+- **Fast** - Static generation means instant page loads
+- **Beautiful** - Modern UI that your users will love
+- **Flexible** - Customize everything from colors to navigation
+- **Free** - Open source and free forever
 
-All internal links in Markdown are automatically converted to hash-based URLs:
+## 🤝 Community
 
-- [Tutorials - First Steps](/tutorials/beginner/first-steps)
-- [State Management Guide](/tutorials/intermediate/state-management)
-- [Security - Authentication](/guides/advanced/security/authentication)
+- **GitHub** - [Star us on GitHub](https://github.com/yourusername/eziwiki)
+- **Issues** - [Report bugs or request features](https://github.com/yourusername/eziwiki/issues)
+- **Discussions** - [Join the community](https://github.com/yourusername/eziwiki/discussions)
 
-You can write links using normal paths, and they'll work automatically!
+---
+
+Ready to build your wiki? Check out the [Quick Start Guide](/getting-started/quick-start)!
