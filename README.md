@@ -5,6 +5,12 @@
 
 <p align="center"><em><strong>A modern, lightweight wiki and documentation generator</strong></em></p>
 
+<p align="center">
+  <a href="https://i3months.com">🌐 Live Demo</a> •
+  <a href="https://eziwiki.vercel.app">🌐 Demo (Vercel)</a> •
+  <a href="https://13months.github.io/eziwiki">🌐 Demo (GitHub Pages)</a>
+</p>
+
 ## Introduction
 
 Anyone can create beautiful documentation sites. (with just a bit of coding..)
