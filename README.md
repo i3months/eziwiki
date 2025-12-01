@@ -8,7 +8,7 @@
 <p align="center">
   <a href="https://i3months.com">🌐 Live Demo</a> •
   <a href="https://eziwiki.vercel.app">🌐 Demo (Vercel)</a> •
-  <a href="https://13months.github.io/eziwiki">🌐 Demo (GitHub Pages)</a>
+  <a href="https://i3months.github.io/eziwiki">🌐 Demo (GitHub Pages)</a>
 </p>
 
 ## Introduction
