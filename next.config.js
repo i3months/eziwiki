@@ -8,8 +8,8 @@ const nextConfig = {
   reactStrictMode: true,
   // Optional: Configure for subdirectory deployment
   // Uncomment and set basePath if deploying to a subdirectory (e.g., GitHub Pages project site)
-  // basePath: '/your-repo-name',
-  // assetPrefix: '/your-repo-name',
+  // basePath: '/eziwiki',
+  // assetPrefix: '/eziwiki',
   trailingSlash: true, // Ensures proper routing for static hosting
   
   // Disable source maps in production to prevent viewing original source
