@@ -98,7 +98,7 @@ Items without `path` act as section headers:
 
 ```typescript
 {
-  name: 'Documentation',  // Not clickable, just a header
+  name: 'Documentation',  // Not clickable
   children: [
     {
       name: 'Getting Started',
