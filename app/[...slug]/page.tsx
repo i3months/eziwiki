@@ -1,6 +1,7 @@
 import { parseMarkdownFile } from '@/lib/markdown/parser';
 import { MarkdownRenderer } from '@/components/markdown/MarkdownRenderer';
 import { MarkdownSkeleton } from '@/components/markdown/MarkdownSkeleton';
+import { PageTransition } from '@/components/markdown/PageTransition';
 import { extractAllPaths } from '@/lib/navigation/builder';
 import { generatePathHash, resolveHashToPath } from '@/lib/navigation/hash';
 import { payload } from '@/payload/config';
@@ -162,10 +163,12 @@ export default async function ContentPage({ params }: PageProps) {
   }
 
   return (
-    <article className="prose prose-slate max-w-none dark:prose-invert">
-      <Suspense fallback={<MarkdownSkeleton />}>
-        <MarkdownContent path={path} hash={hash} />
-      </Suspense>
-    </article>
+    <PageTransition>
+      <article className="prose prose-slate max-w-none dark:prose-invert">
+        <Suspense fallback={<MarkdownSkeleton />}>
+          <MarkdownContent path={path} hash={hash} />
+        </Suspense>
+      </article>
+    </PageTransition>
   );
 }
