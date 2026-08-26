@@ -25,7 +25,17 @@ export function Collapse({
       className="grid transition-[grid-template-rows] duration-[120ms]"
       style={{ gridTemplateRows: expanded ? '1fr' : '0fr', ...style }}
     >
-      <div className="min-h-0 overflow-hidden">{children}</div>
+      {/* Collapsed content stays mounted for the animation, and `inert`
+          keeps it out of the tab order and the accessibility tree while it
+          is: without this every link in a folded section — which on a phone
+          is every section — was a hidden tab stop. Cast because React 18's
+          types know the attribute only as a boolean. */}
+      <div
+        className="min-h-0 overflow-hidden"
+        {...((expanded ? {} : { inert: '' }) as React.HTMLAttributes<HTMLDivElement>)}
+      >
+        {children}
+      </div>
     </div>
   );
 }
