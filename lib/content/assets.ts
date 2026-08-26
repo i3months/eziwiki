@@ -139,9 +139,11 @@ export function getAssetRegistry(): AssetRegistry {
   const hit = cached(memo, memoStamp);
   if (hit) return hit;
 
+  // Composed, as content paths are: a name read off a macOS volume arrives
+  // decomposed, and `![[설치.png]]` typed on a keyboard never matched it.
   const assets: Asset[] = walkAssets(PUBLIC_DIR, PUBLIC_DIR).map((relative) => ({
-    path: relative,
-    url: `/${relative}`,
+    path: relative.normalize('NFC'),
+    url: `/${relative.normalize('NFC')}`,
     // Non-null: `walkAssets` only returns files whose extension is a key.
     kind: EMBEDDABLE.get(path.extname(relative).toLowerCase())!,
     size: fileSize(path.join(PUBLIC_DIR, relative)),
@@ -182,7 +184,7 @@ export function getAssetRegistry(): AssetRegistry {
  * ```
  */
 export function resolveAsset(target: string): Asset | null {
-  const key = target.trim().replace(/^\/+/, '').toLowerCase();
+  const key = target.normalize('NFC').trim().replace(/^\/+/, '').toLowerCase();
   if (!key) return null;
 
   const { byPath, byName } = getAssetRegistry();
