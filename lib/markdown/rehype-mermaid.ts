@@ -70,7 +70,9 @@ function isMermaidFence(node: Element): boolean {
   const className = node.properties?.className;
   const classes = Array.isArray(className) ? className.map(String) : [];
 
-  return classes.includes(FENCE_CLASS);
+  // Case-insensitively: this runs before the code shell lower-cases the
+  // language, and ```Mermaid was otherwise highlighted rather than drawn.
+  return classes.some((cls) => String(cls).toLowerCase() === FENCE_CLASS);
 }
 
 /**
