@@ -50,6 +50,7 @@ export function getAliasMap(): AliasMap {
   // writes second replaces the first — the live page becoming a redirect to
   // itself, or the alias vanishing, depending on the order.
   const pagesByFold = new Map(docs.map((doc) => [doc.path.toLowerCase(), doc.path]));
+  const claimedFold = new Map<string, string>();
 
   for (const doc of docs) {
     for (const alias of doc.aliases) {
@@ -61,7 +62,7 @@ export function getAliasMap(): AliasMap {
         );
       }
 
-      const claimed = map.get(alias);
+      const claimed = map.get(alias) ?? claimedFold.get(alias.toLowerCase());
       if (claimed && claimed !== doc.path) {
         throw new Error(
           `Alias collision: '${alias}' is claimed by both content/${claimed}.md ` +
@@ -70,6 +71,7 @@ export function getAliasMap(): AliasMap {
       }
 
       map.set(alias, doc.path);
+      claimedFold.set(alias.toLowerCase(), doc.path);
     }
   }
 
