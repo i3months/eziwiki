@@ -94,6 +94,15 @@ describe('callouts', () => {
     expect(html).toMatch(/<p>Body text\.<\/p>/);
   });
 
+  it('ends the title at a hard break', async () => {
+    // Two trailing spaces are a `break` node, not a newline in the text;
+    // the title used to run on through it and swallow the body.
+    const { html } = await render('> [!NOTE] Title  \n> Body text.');
+
+    expect(html).toMatch(/ezw-callout__title">Title<\/p>/);
+    expect(html).toContain('Body text.');
+  });
+
   it('converts a callout nested inside another', async () => {
     const { html } = await render('> [!NOTE] Outer\n> > [!TIP] Inner\n> > Inner body.');
 

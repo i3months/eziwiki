@@ -1,4 +1,5 @@
 import { visit } from 'unist-util-visit';
+import { toString as mdastToString } from 'mdast-util-to-string';
 import type { Root, Blockquote, PhrasingContent, BlockContent } from 'mdast';
 
 /**
@@ -114,6 +115,17 @@ function readMarker(node: Blockquote): Marker | null {
     let i = 1;
     for (; i < first.children.length; i++) {
       const child = first.children[i];
+
+      // A hard break — two trailing spaces, or a backslash — ends the line
+      // as surely as a newline in the text does, and the body follows it.
+      if (child.type === 'break') {
+        i += 1;
+        break;
+      }
+
+      // Emphasis or a link that runs on past the end of the line carries
+      // the newline inside itself; the title ends where that node begins.
+      if (child.type !== 'text' && mdastToString(child).includes('\n')) break;
 
       if (child.type === 'text' && child.value.includes('\n')) {
         const at = child.value.indexOf('\n');
