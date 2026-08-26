@@ -127,7 +127,9 @@ export function getTags(): Tag[] {
  * @returns The tag, or null when nothing carries it
  */
 export function getTag(slug: string): Tag | null {
-  const wanted = decodeURIComponent(slug).toLowerCase();
+  // Through `tagSlug`, so the name itself finds the tag as well as its slug;
+  // a slug run through it again is unchanged.
+  const wanted = tagSlug(decodeURIComponent(slug));
   return getTags().find((tag) => tag.slug === wanted) ?? null;
 }
 
