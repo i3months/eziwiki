@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { NavigationItem } from '@/lib/payload/types';
 import { Sidebar } from './Sidebar';
 import { MobileMenu } from './MobileMenu';
@@ -36,13 +36,16 @@ export function PageLayout({ navigation, repoUrl, children }: PageLayoutProps) {
   const t = useStrings();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
+  const toggleMobileMenu = useCallback(() => {
+    setIsMobileMenuOpen((open) => !open);
+  }, []);
 
-  const closeMobileMenu = () => {
+  // Stable, because the drawer's focus effect depends on it: a new function
+  // each render would re-run that effect on every re-render of this layout,
+  // yanking focus back to the button and then into the drawer again.
+  const closeMobileMenu = useCallback(() => {
     setIsMobileMenuOpen(false);
-  };
+  }, []);
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950">
