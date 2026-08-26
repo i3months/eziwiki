@@ -268,7 +268,7 @@ export function SearchDialog() {
             role="combobox"
             aria-expanded={results.length > 0}
             aria-autocomplete="list"
-            aria-controls="search-results"
+            aria-controls={results.length > 0 ? 'search-results' : undefined}
             aria-activedescendant={results.length > 0 ? `search-result-${selected}` : undefined}
             className="flex-1 bg-transparent py-3.5 text-sm text-gray-900 outline-none placeholder:text-gray-500 dark:text-gray-100 dark:placeholder:text-gray-400"
           />
