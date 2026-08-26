@@ -6,6 +6,8 @@ import { useTabStore } from '@/lib/store/tabStore';
 import { NavigationItem } from '@/lib/payload/types';
 import { useUrlMap } from '@/components/providers/UrlMapProvider';
 import { normalizeSlug } from '@/lib/navigation/url';
+import { useStrings } from '@/components/providers/StringsProvider';
+import type { Strings } from '@/lib/i18n/strings';
 
 interface TabInitializerProps {
   navigation: NavigationItem[];
@@ -57,8 +59,10 @@ function isAppRoute(pathname: string): boolean {
 }
 
 /** The tab title for an app route: '/tags/deployment/' becomes 'Tags'. */
-function routeTitle(pathname: string): string {
+function routeTitle(pathname: string, t: Strings): string {
   const [segment = ''] = normalizeSlug(pathname).split('/');
+  if (segment === 'graph') return t.graph;
+  if (segment === 'tags') return t.tags;
   return segment.charAt(0).toUpperCase() + segment.slice(1);
 }
 
@@ -74,6 +78,7 @@ interface TabEntry {
 export function TabInitializer({ navigation }: TabInitializerProps) {
   const pathname = usePathname();
   const { toPath } = useUrlMap();
+  const t = useStrings();
   const { tabs, addTab, activeTabId, navigateInHistory, hasHydrated } = useTabStore();
   const isInitialMount = useRef(true);
   const previousPathname = useRef(pathname);
@@ -82,15 +87,15 @@ export function TabInitializer({ navigation }: TabInitializerProps) {
     if (!hasHydrated) return;
 
     const resolve = (): TabEntry | null => {
-      if (pathname === '/') return { path: '', title: 'New Tab' };
+      if (pathname === '/') return { path: '', title: t.newTabTitle };
 
       const docPath = toPath(pathname);
       if (docPath !== null) {
         const navItem = findNavigationItemByPath(navigation, docPath);
-        return { path: docPath, title: navItem?.name || 'New Tab' };
+        return { path: docPath, title: navItem?.name || t.newTabTitle };
       }
 
-      return isAppRoute(pathname) ? { path: pathname, title: routeTitle(pathname) } : null;
+      return isAppRoute(pathname) ? { path: pathname, title: routeTitle(pathname, t) } : null;
     };
 
     const entry = resolve();
@@ -100,7 +105,7 @@ export function TabInitializer({ navigation }: TabInitializerProps) {
     // the list is empty: this branch is what brings the bar back, whatever
     // emptied it. An unrecordable route still gets a tab, pointed home.
     if (tabs.length === 0) {
-      addTab(entry ?? { title: 'New Tab', path: '' });
+      addTab(entry ?? { title: t.newTabTitle, path: '' });
 
       isInitialMount.current = false;
       previousPathname.current = pathname;
@@ -138,6 +143,7 @@ export function TabInitializer({ navigation }: TabInitializerProps) {
     addTab,
     activeTabId,
     navigateInHistory,
+    t,
   ]);
 
   return null;
