@@ -8,23 +8,11 @@ import type {
   RootContent,
   BlockContent,
 } from 'mdast';
-import GithubSlugger from 'github-slugger';
 import { WIKILINK_PATTERN, parseWikiLink, type WikiLink } from './wikilink';
 import { remarkCallouts } from './remark-callout';
+import { slugAnchor } from './headings';
 import { getStrings } from '../site';
 import { format, formatBytes } from '../i18n/format';
-
-/**
- * Slugs a heading anchor the way rehype-slug ids the heading.
- *
- * Authors coming from Obsidian write `[[page#Heading text]]`, and until now
- * that shipped as `#Heading%20text` — a dead link, since the id is
- * `heading-text`. An id written as such passes through unchanged, so both
- * spellings reach the same place.
- */
-function slugAnchor(anchor: string): string {
-  return new GithubSlugger().slug(anchor);
-}
 
 /**
  * Turns `[[wiki links]]` into ordinary Markdown links.

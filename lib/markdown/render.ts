@@ -39,8 +39,7 @@ import { resolveTarget } from '../content/resolver';
 import { resolveAsset } from '../content/assets';
 import { getPdfImages } from '../content/pdfImages';
 import { getExcerpt } from '../content/excerpt';
-import GithubSlugger from 'github-slugger';
-import { headingSlugs } from './headings';
+import { headingSlugs, slugAnchor, type HeadingSlug } from './headings';
 import { docPathToUrl } from '../navigation/url';
 
 /**
@@ -153,8 +152,10 @@ const transclusionParser = unified().use(remarkParse).use(remarkGfm).use(remarkM
 function sliceSection(nodes: RootContent[], anchor: string): RootContent[] | null {
   // Slugged so that the heading may be named as written — `#설치 방법` — as
   // well as by its id; slugging an id again leaves it unchanged.
-  const wanted = new GithubSlugger().slug(anchor);
-  const headings = headingSlugs(nodes);
+  const wanted = slugAnchor(anchor);
+  const headings = headingSlugs(nodes).filter(
+    (heading): heading is HeadingSlug & { index: number } => heading.index !== undefined,
+  );
 
   const at = headings.findIndex((heading) => heading.slug === wanted);
   if (at === -1) return null;

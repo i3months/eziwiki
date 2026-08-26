@@ -2,12 +2,11 @@ import { unified } from 'unified';
 import remarkParse from 'remark-parse';
 import remarkGfm from 'remark-gfm';
 import { visit } from 'unist-util-visit';
-import GithubSlugger from 'github-slugger';
 import type { Root, Link, Text } from 'mdast';
 import { getContentRegistry, type ContentDoc } from '../content/registry';
 import { resolveTarget } from '../content/resolver';
 import { findWikiLinks } from '../markdown/wikilink';
-import { headingSlugs } from '../markdown/headings';
+import { headingSlugs, slugAnchor } from '../markdown/headings';
 import { resolveAsset } from '../content/assets';
 import { getAliasMap } from '../content/aliases';
 import { isReservedUrl } from '../navigation/routes';
@@ -139,7 +138,7 @@ function hasHeading(doc: ContentDoc, anchor: string): boolean {
     headingMemo.set(doc.path, ids);
   }
 
-  return ids === null || ids.has(new GithubSlugger().slug(anchor));
+  return ids === null || ids.has(slugAnchor(anchor));
 }
 
 /**
