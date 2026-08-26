@@ -212,7 +212,10 @@ export function mergeDiscoveredDocs(curated: NavigationItem[]): NavigationItem[]
  */
 function markHiddenDocs(items: NavigationItem[], hidden: Set<string>): void {
   for (const item of items) {
-    if (item.path && hidden.has(item.path)) item.hidden = true;
+    // An entry that heads a section is left alone: `hidden` is inherited by
+    // everything beneath it, and a page hiding itself says nothing about the
+    // pages filed under it.
+    if (item.path && !item.children?.length && hidden.has(item.path)) item.hidden = true;
     if (item.children) markHiddenDocs(item.children, hidden);
   }
 }
