@@ -99,7 +99,12 @@ function classifyMarkdownLink(url: string): MarkdownRef {
   if (!url || url.startsWith('#')) return { kind: 'other' };
   if (/^[a-z][a-z0-9+.-]*:/i.test(url) || url.startsWith('//')) return { kind: 'other' };
 
-  const path = url.split(/[#?]/)[0].replace(/^\/+/, '').replace(/\.md$/i, '').replace(/\/+$/, '');
+  const path = url
+    .split(/[#?]/)[0]
+    .replace(/^(\.\/)+/, '')
+    .replace(/^\/+/, '')
+    .replace(/\.md$/i, '')
+    .replace(/\/+$/, '');
   if (!path) return { kind: 'other' };
 
   const { byPath } = getContentRegistry();

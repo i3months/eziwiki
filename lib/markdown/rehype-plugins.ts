@@ -164,7 +164,13 @@ export function rehypeInternalLinks(source: UrlMap | (() => UrlMap)) {
       if (!match) return;
 
       const [, rawPath, suffix] = match;
-      const docPath = rawPath.replace(/^\/+/, '').replace(/\.md$/, '').replace(/\/+$/, '');
+      // `./page` is the same reference as `/page` or `page`; left as written
+      // it was resolved by the browser against the current directory instead.
+      const docPath = rawPath
+        .replace(/^(\.\/)+/, '')
+        .replace(/^\/+/, '')
+        .replace(/\.md$/, '')
+        .replace(/\/+$/, '');
       if (!docPath) return;
 
       const url = docPathToUrl(urlMap, docPath);
