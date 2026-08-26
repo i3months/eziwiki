@@ -32,6 +32,9 @@ export function TabBar() {
   const tabBarRef = useRef<HTMLDivElement>(null);
   const tabRefs = useRef(new Map<string, HTMLDivElement>());
   const menuRef = useRef<HTMLDivElement>(null);
+  // Set when a tab is closed from the keyboard or the menu: the focused tab
+  // unmounts with it, and focus would drop to the body.
+  const focusActiveTab = useRef(false);
 
   const handleNewTab = () => {
     addTab({ title: t.newTabTitle, path: '' });
@@ -126,6 +129,7 @@ export function TabBar() {
       case 'Delete':
       case 'Backspace':
         event.preventDefault();
+        focusActiveTab.current = true;
         closeTab(tab.id);
         return;
       case 'ContextMenu':
@@ -228,7 +232,10 @@ export function TabBar() {
   }, [contextMenu]);
 
   // The menu takes focus while it is up and gives it back to the tab after,
-  // so a keyboard reader who opened it is not left on the body.
+  // so a keyboard reader who opened it is not left on the body. Only when
+  // focus did fall to the body, though: the menu also closes on any click,
+  // and a reader who dismissed it by clicking into the article must not have
+  // their focus pulled back to the strip.
   React.useEffect(() => {
     if (!contextMenu) return;
 
@@ -237,9 +244,19 @@ export function TabBar() {
     menuRef.current?.querySelector('button')?.focus();
 
     return () => {
-      refs.get(tabId)?.focus();
+      if (document.activeElement !== document.body) return;
+      const target = refs.get(tabId) ?? refs.get(useTabStore.getState().activeTabId ?? '');
+      target?.focus();
     };
   }, [contextMenu]);
+
+  // After a close from the keyboard or the menu, the tab that was focused is
+  // gone; the one now active takes its place as the strip's stop.
+  React.useEffect(() => {
+    if (!focusActiveTab.current) return;
+    focusActiveTab.current = false;
+    if (activeTabId) tabRefs.current.get(activeTabId)?.focus();
+  }, [tabs, activeTabId]);
 
   // Show skeleton while hydrating, and through the empty frame right after:
   // hydration can finish with no stored tabs, and the first tab only arrives
@@ -389,6 +406,7 @@ export function TabBar() {
         >
           <button
             onClick={() => {
+              focusActiveTab.current = true;
               closeTab(contextMenu.tabId);
               handleCloseContextMenu();
             }}
@@ -399,6 +417,7 @@ export function TabBar() {
           </button>
           <button
             onClick={() => {
+              focusActiveTab.current = true;
               closeFromMenu(closeOtherTabs, contextMenu.tabId);
               handleCloseContextMenu();
             }}
@@ -409,6 +428,7 @@ export function TabBar() {
           </button>
           <button
             onClick={() => {
+              focusActiveTab.current = true;
               closeFromMenu(closeTabsToRight, contextMenu.tabId);
               handleCloseContextMenu();
             }}
