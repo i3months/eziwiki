@@ -255,12 +255,18 @@ function main() {
   const lockPath = path.join(TEMPLATE_DIR, 'package-lock.json');
   if (fs.existsSync(lockPath)) {
     const lock = JSON.parse(fs.readFileSync(lockPath, 'utf-8'));
+    const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf-8'));
 
     lock.name = 'my-wiki';
     lock.version = '0.1.0';
     if (lock.packages?.['']) {
       lock.packages[''].name = 'my-wiki';
       lock.packages[''].version = '0.1.0';
+      // The root entry mirrors the manifest field by field; anything the
+      // manifest lacks, or has that the lock does not, is rewritten by the
+      // first install.
+      delete lock.packages[''].license;
+      lock.packages[''].engines = pkg.engines;
 
       // The manifest above dropped `@napi-rs/canvas`; the lockfile has to
       // agree, or the first `npm install` in a new project rewrites it — the
