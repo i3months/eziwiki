@@ -969,9 +969,12 @@ details.ezw-callout:not([open]) > summary.ezw-callout__title {
 
 /* A URL or an identifier with nothing to break at widened the article past
    the phone's screen and the whole page scrolled sideways. Hangul already
-   breaks per syllable, so prose in Korean is unaffected. */
+   breaks per syllable, so prose in Korean is unaffected. `break-word` rather
+   than `anywhere`: the latter also lowers min-content sizes, which table
+   layout is driven by, so a wide table squeezed itself into the column and
+   broke words mid-cell instead of scrolling in its wrapper. */
 .ezw-prose {
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
 }
 
 .ezw-prose .katex-display {
