@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isLightColor } from './color';
+import { isLightColor, isSafeCssColor } from './color';
 
 describe('isLightColor', () => {
   it('reads a pale section tint as light', () => {
@@ -51,5 +51,25 @@ describe('isLightColor on mid-tones', () => {
 
   it('puts dark ink on a bright orange', () => {
     expect(isLightColor('#f97316')).toBe(true);
+  });
+});
+
+// The value lands in a style attribute, where a semicolon starts a second
+// declaration.
+describe('isSafeCssColor', () => {
+  it('accepts the forms a colour takes', () => {
+    expect(isSafeCssColor('#fef3c7')).toBe(true);
+    expect(isSafeCssColor('#fff')).toBe(true);
+    expect(isSafeCssColor('rgb(255, 0, 0)')).toBe(true);
+    expect(isSafeCssColor('rgba(20 20 20 / 0.5)')).toBe(true);
+    expect(isSafeCssColor('hsl(210, 40%, 96%)')).toBe(true);
+    expect(isSafeCssColor('lightyellow')).toBe(true);
+  });
+
+  it('refuses anything that is more than a colour', () => {
+    expect(isSafeCssColor('red; background: url(https://evil.example/x)')).toBe(false);
+    expect(isSafeCssColor('url(x)')).toBe(false);
+    expect(isSafeCssColor('#fff}')).toBe(false);
+    expect(isSafeCssColor('')).toBe(false);
   });
 });

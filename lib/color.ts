@@ -59,3 +59,25 @@ function luminance(r: number, g: number, b: number): number {
   };
   return 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b);
 }
+
+/**
+ * Whether a colour is safe to place in an inline style.
+ *
+ * A section's colour comes from `_meta.json` or frontmatter, which a
+ * contributor can write, and it lands in a `style` attribute. React escapes
+ * the quotes but not a semicolon, so `red; background: url(https://…)` used
+ * to become a second declaration — a beacon reporting every reader, or an
+ * overlay drawn over the page. Only the forms a colour can take are let
+ * through: hex, `rgb()`/`hsl()` of numbers, or a bare name.
+ *
+ * @param color - The value as written
+ * @returns true when it is a colour and nothing more
+ */
+export function isSafeCssColor(color: string): boolean {
+  const value = color.trim();
+  return (
+    /^#[0-9a-f]{3,8}$/i.test(value) ||
+    /^(rgb|hsl)a?\(\s*[\d.]+%?(\s*[,/\s]\s*[\d.]+%?){2,3}\s*\)$/i.test(value) ||
+    /^[a-z]{3,30}$/i.test(value)
+  );
+}

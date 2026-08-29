@@ -2,6 +2,7 @@ import { NavigationItem } from '../payload/types';
 import { getContentRegistry, titleize, type ContentDoc, type DirMeta } from '../content/registry';
 import { extractAllPaths } from './builder';
 import { cached, contentGeneration, stamp } from '../cache';
+import { isSafeCssColor } from '../color';
 
 /**
  * Filesystem-derived navigation.
@@ -125,7 +126,9 @@ function docToNavItem(doc: ContentDoc): NavigationItem {
   };
 
   if (typeof doc.frontmatter.icon === 'string') item.icon = doc.frontmatter.icon;
-  if (typeof doc.frontmatter.color === 'string') item.color = doc.frontmatter.color;
+  if (typeof doc.frontmatter.color === 'string' && isSafeCssColor(doc.frontmatter.color)) {
+    item.color = doc.frontmatter.color;
+  }
 
   return item;
 }

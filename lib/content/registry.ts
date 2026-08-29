@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 import { CONTENT_DIR, cached, contentGeneration, stamp } from '../cache';
+import { isSafeCssColor } from '../color';
 
 /**
  * A single Markdown document discovered under the content directory.
@@ -197,7 +198,12 @@ function readDirMeta(dirPath: string): DirMeta {
     const raw = fs.readFileSync(metaPath, 'utf-8');
     const parsed = JSON.parse(raw) as unknown;
     if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
-      return parsed as DirMeta;
+      const meta = parsed as DirMeta;
+      // The colour lands in a style attribute, where anything past a
+      // semicolon is a declaration of the author's choosing; only a colour
+      // gets through.
+      if (typeof meta.color === 'string' && !isSafeCssColor(meta.color)) delete meta.color;
+      return meta;
     }
     return {};
   } catch {
