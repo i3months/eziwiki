@@ -6,6 +6,15 @@ on:
   pull_request:
     branches: [main, develop]
 
+# Nothing here writes to the repository; the default token would let it.
+permissions:
+  contents: read
+
+# A pull request pushed twice in a minute needs one run, not two.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   quality:
     name: Lint, Format & Types
@@ -36,8 +45,13 @@ jobs:
         run: npm run type-check
 
   test:
-    name: Test
+    name: Test (Node ${{ matrix.node }})
     runs-on: ubuntu-latest
+
+    # The floor the manifest declares, and the current LTS above it.
+    strategy:
+      matrix:
+        node: [20, 22]
 
     steps:
       - name: Checkout code
@@ -46,7 +60,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: ${{ matrix.node }}
           cache: 'npm'
 
       - name: Install dependencies

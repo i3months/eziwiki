@@ -1,0 +1,57 @@
+name: Release
+
+# Publishes `create-eziwiki` when a `v*` tag is pushed. The tag has to match
+# the package's version, so a release is one `npm version` and one `git push
+# --follow-tags`, and the published tarball carries provenance back to the
+# commit it was built from.
+#
+# Needs an `NPM_TOKEN` repository secret with publish rights, or npm trusted
+# publishing configured for this workflow — in which case the token line can
+# be removed.
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    name: Publish create-eziwiki
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check that the tag matches the package version
+        run: |
+          version="$(node -p "require('./packages/create-eziwiki/package.json').version")"
+          if [ "${GITHUB_REF_NAME}" != "v${version}" ]; then
+            echo "Tag ${GITHUB_REF_NAME} does not match create-eziwiki ${version}" >&2
+            exit 1
+          fi
+
+      # `prepack` rebuilds the template from this checkout; the tests run
+      # against it before anything is published.
+      - name: Build and test the template
+        run: |
+          npm run build:template
+          npx vitest --run packages/create-eziwiki/lib
+
+      - name: Publish
+        working-directory: packages/create-eziwiki
+        run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

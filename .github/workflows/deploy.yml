@@ -51,10 +51,19 @@ jobs:
       - name: Resolve base path
         id: base
         run: |
-          case "${{ github.event.repository.name }}" in
-            *.github.io) echo "path=" >> "$GITHUB_OUTPUT" ;;
-            *) echo "path=/${{ github.event.repository.name }}" >> "$GITHUB_OUTPUT" ;;
-          esac
+          # A repository variable BASE_PATH overrides the guess — set it to
+          # "/" for a project site on a custom domain, which is served from
+          # the root of that domain.
+          if [ -n "${{ vars.BASE_PATH }}" ]; then
+            p="${{ vars.BASE_PATH }}"
+            [ "$p" = "/" ] && p=""
+            echo "path=$p" >> "$GITHUB_OUTPUT"
+          else
+            case "${{ github.event.repository.name }}" in
+              *.github.io) echo "path=" >> "$GITHUB_OUTPUT" ;;
+              *) echo "path=/${{ github.event.repository.name }}" >> "$GITHUB_OUTPUT" ;;
+            esac
+          fi
 
       #
       # `NEXT_PUBLIC_SITE_URL` is deliberately not set. This deployment is a

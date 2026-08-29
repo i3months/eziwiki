@@ -1,0 +1,19 @@
+# Weekly, grouped, so an update is one pull request rather than twenty. The
+# scaffolder ships a lockfile of its own, so its directory is watched too.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      dependencies:
+        patterns: ['*']
+  - package-ecosystem: npm
+    directory: /packages/create-eziwiki
+    schedule:
+      interval: weekly
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
