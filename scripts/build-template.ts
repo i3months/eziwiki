@@ -77,7 +77,9 @@ function findReferencedFonts(): string[] {
     if (!fs.statSync(dir).isDirectory()) continue;
 
     for (const file of fs.readdirSync(dir)) {
-      if (file.endsWith('.woff2') || file.endsWith('.woff')) {
+      // The licence travels with the files it covers: the OFL requires the
+      // text to accompany the fonts wherever they are redistributed.
+      if (file.endsWith('.woff2') || file.endsWith('.woff') || file.startsWith('LICENSE')) {
         found.push(`fonts/${family}/${file}`);
       }
     }
@@ -235,7 +237,7 @@ function main() {
     files += 1;
   }
 
-  console.log(`   fonts: ${fonts.length} referenced weights`);
+  console.log(`   fonts: ${fonts.length} files (weights and licence)`);
 
   // Keep the images directory present in the tarball.
   fs.writeFileSync(path.join(publicDir, 'images', '.gitkeep'), '', 'utf-8');
