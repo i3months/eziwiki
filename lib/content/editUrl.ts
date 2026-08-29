@@ -74,7 +74,10 @@ function getTemplate({ editUrl, repoUrl, editBranch }: EditConfig): string | nul
  */
 export function buildEditUrl(config: EditConfig, docPath: string): string | null {
   const template = getTemplate(config);
-  return template ? template.replace('{path}', `${docPath}.md`) : null;
+  // Each segment encoded on its own: a space or a `#` in a file name is a
+  // wrong link otherwise, and the slashes have to stay slashes.
+  const encoded = docPath.split('/').map(encodeURIComponent).join('/');
+  return template ? template.replace('{path}', `${encoded}.md`) : null;
 }
 
 /**
