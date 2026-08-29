@@ -15,6 +15,7 @@ import { getLastModified, getPublished } from '@/lib/content/lastModified';
 import { getEditUrl } from '@/lib/content/editUrl';
 import { getExcerpt } from '@/lib/content/excerpt';
 import { oneLine } from '@/lib/content/llms';
+import { jsonLd } from '@/lib/seo/jsonLd';
 import { getBreadcrumbTrail } from '@/lib/navigation/breadcrumb';
 import { renderDoc } from '@/lib/markdown/render';
 import { getDoc, type ContentDoc } from '@/lib/content/registry';
@@ -208,7 +209,9 @@ function ArticleSchema({ doc, url }: { doc: ContentDoc; url: string }) {
     <script
       type="application/ld+json"
       dangerouslySetInnerHTML={{
-        __html: JSON.stringify({
+        // Through `jsonLd`, never `JSON.stringify`: the title is a
+        // contributor's to write, and `</script>` in it ended the data block.
+        __html: jsonLd({
           '@context': 'https://schema.org',
           '@type': 'Article',
           headline: doc.title,
@@ -252,7 +255,7 @@ function BreadcrumbSchema({ path }: { path: string }) {
     <script
       type="application/ld+json"
       dangerouslySetInnerHTML={{
-        __html: JSON.stringify({
+        __html: jsonLd({
           '@context': 'https://schema.org',
           '@type': 'BreadcrumbList',
           itemListElement: trail.map((crumb, index) => {

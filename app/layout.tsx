@@ -10,6 +10,7 @@ import { payload } from '@/payload/config';
 import { validatePayload } from '@/lib/payload/validator';
 import { getSite } from '@/lib/site';
 import { themeCss } from '@/lib/theme';
+import { jsonLd } from '@/lib/seo/jsonLd';
 import { asset, fileUrl, pageUrl } from '@/lib/basePath';
 
 // Validate payload at build time
@@ -188,7 +189,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
+            __html: jsonLd({
               '@context': 'https://schema.org',
               '@type': 'WebSite',
               name: site.global.title,

@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { asset } from '@/lib/basePath';
+import { jsonLd } from '@/lib/seo/jsonLd';
 import { format } from '@/lib/i18n/strings';
 import { getStrings } from '@/lib/site';
 
@@ -32,7 +33,7 @@ export function MovedPage({ url, title }: { url: string; title: string }) {
           fragment was kept or dropped by chance. */}
       <script
         dangerouslySetInnerHTML={{
-          __html: `location.replace(${JSON.stringify(asset(url))}+location.search+location.hash)`,
+          __html: `location.replace(${jsonLd(asset(url))}+location.search+location.hash)`,
         }}
       />
       <noscript>
