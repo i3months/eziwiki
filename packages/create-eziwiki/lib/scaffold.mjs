@@ -79,15 +79,20 @@ export function validateProjectName(name) {
  *
  * @param {object} pkg - Parsed template package.json
  * @param {string} projectName - Name for the new project
+ * @param {string} [cliVersion] - The create-eziwiki release doing the writing
  * @returns {object} The rewritten manifest
  */
-export function buildProjectPackageJson(pkg, projectName) {
+export function buildProjectPackageJson(pkg, projectName, cliVersion) {
   const next = {
     ...pkg,
     name: projectName,
     version: '0.1.0',
     private: true,
     description: `Documentation site built with eziwiki`,
+    // The engine directories are copied in rather than depended on, so this
+    // is the one place a project can say which release they came from — for
+    // a bug report, and for knowing whether an update is due.
+    ...(cliVersion ? { eziwiki: { version: cliVersion } } : {}),
   };
 
   // Fields that only make sense for the source repository.
@@ -177,7 +182,7 @@ export function copyTemplate(from, to) {
  * @returns {{ files: number }} Summary of what was written
  * @throws {Error} If the target is unusable or the template is missing
  */
-export function scaffold({ templateDir, targetDir, projectName }) {
+export function scaffold({ templateDir, targetDir, projectName, cliVersion }) {
   if (!fs.existsSync(templateDir)) {
     throw new Error(
       `Template not found at ${templateDir}. ` +
@@ -195,7 +200,7 @@ export function scaffold({ templateDir, targetDir, projectName }) {
 
   fs.writeFileSync(
     manifestPath,
-    `${JSON.stringify(buildProjectPackageJson(manifest, projectName), null, 2)}\n`,
+    `${JSON.stringify(buildProjectPackageJson(manifest, projectName, cliVersion), null, 2)}\n`,
     'utf-8',
   );
 

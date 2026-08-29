@@ -16,6 +16,9 @@ import { scaffold, validateProjectName } from '../lib/scaffold.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const TEMPLATE_DIR = path.resolve(HERE, '..', 'template');
+// This package's own version: `npm_package_version` names the package npm was
+// run from, which under `npx` is the user's project — or nothing at all.
+const VERSION = JSON.parse(fs.readFileSync(path.join(HERE, '..', 'package.json'), 'utf-8')).version;
 
 const HELP = `
   create-eziwiki — scaffold a new eziwiki documentation site
@@ -43,11 +46,7 @@ function main() {
   }
 
   if (args.includes('-v') || args.includes('--version')) {
-    // Read from this package's own manifest: `npm_package_version` names the
-    // package npm was run from, which under `npx` is the user's project — or
-    // nothing at all.
-    const manifest = JSON.parse(fs.readFileSync(path.join(HERE, '..', 'package.json'), 'utf-8'));
-    console.log(manifest.version);
+    console.log(VERSION);
     process.exit(0);
   }
 
@@ -63,7 +62,7 @@ function main() {
 
   let result;
   try {
-    result = scaffold({ templateDir: TEMPLATE_DIR, targetDir, projectName });
+    result = scaffold({ templateDir: TEMPLATE_DIR, targetDir, projectName, cliVersion: VERSION });
   } catch (error) {
     console.error(`\n  ✖ ${error instanceof Error ? error.message : String(error)}\n`);
     process.exit(1);

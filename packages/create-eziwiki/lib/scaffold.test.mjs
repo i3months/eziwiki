@@ -268,3 +268,15 @@ describe('scaffold', () => {
     ).toThrow(/build:template/);
   });
 });
+
+describe('buildProjectPackageJson provenance', () => {
+  it('records the release the project was created from', () => {
+    const pkg = buildProjectPackageJson({ name: 'my-wiki', scripts: {} }, 'my-docs', '0.5.0');
+    expect(pkg.eziwiki).toEqual({ version: '0.5.0' });
+  });
+
+  it('records nothing when no release is known', () => {
+    const pkg = buildProjectPackageJson({ name: 'my-wiki', scripts: {} }, 'my-docs');
+    expect(pkg.eziwiki).toBeUndefined();
+  });
+});
