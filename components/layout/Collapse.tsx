@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 /**
  * Collapsible container for a navigation subtree.
@@ -20,6 +20,14 @@ export function Collapse({
   style?: React.CSSProperties;
   children: React.ReactNode;
 }) {
+  // A section's pages are rendered the first time it opens, and kept after
+  // so the closing animation has something to fold. Rendered from the start,
+  // every page in every folded section was in every page's HTML.
+  const [rendered, setRendered] = useState(expanded);
+  useEffect(() => {
+    if (expanded) setRendered(true);
+  }, [expanded]);
+
   return (
     <div
       className="grid transition-[grid-template-rows] duration-[120ms]"
@@ -34,7 +42,7 @@ export function Collapse({
         className="min-h-0 overflow-hidden"
         {...((expanded ? {} : { inert: '' }) as React.HTMLAttributes<HTMLDivElement>)}
       >
-        {children}
+        {rendered && children}
       </div>
     </div>
   );

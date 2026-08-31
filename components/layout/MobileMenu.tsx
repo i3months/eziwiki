@@ -245,6 +245,15 @@ export function MobileMenu({ navigation, isOpen, onClose, repoUrl }: MobileMenuP
 
   const drawerRef = useRef<HTMLDivElement>(null);
 
+  // The tree is rendered the first time the drawer opens, and kept after.
+  // Rendered from the start it was in every page's HTML — the whole
+  // navigation a second time, behind a drawer that is closed and, from `md`
+  // up, does not exist — which at a thousand pages was half the page.
+  const [hasOpened, setHasOpened] = useState(false);
+  useEffect(() => {
+    if (isOpen) setHasOpened(true);
+  }, [isOpen]);
+
   // Focus follows the drawer: into it when it opens, back to whatever opened
   // it when it closes, and Escape closes it. Without this a keyboard or
   // screen-reader user opened the menu and was left where they were, with
@@ -328,15 +337,16 @@ export function MobileMenu({ navigation, isOpen, onClose, repoUrl }: MobileMenuP
                 </svg>
               </button>
             </div>
-            {visibleNavigation.map((item, index) => (
-              <MobileNavigationItem
-                key={`${item.name}-${index}`}
-                item={item}
-                currentPath={currentPath}
-                level={0}
-                onNavigate={onClose}
-              />
-            ))}
+            {hasOpened &&
+              visibleNavigation.map((item, index) => (
+                <MobileNavigationItem
+                  key={`${item.name}-${index}`}
+                  item={item}
+                  currentPath={currentPath}
+                  level={0}
+                  onNavigate={onClose}
+                />
+              ))}
           </nav>
         </div>
       </div>
