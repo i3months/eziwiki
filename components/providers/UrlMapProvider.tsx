@@ -5,8 +5,10 @@ import {
   EMPTY_URL_MAP,
   docPathToUrl,
   hrefFor,
+  unpackUrlMap,
   urlToDocPath,
   type UrlMap,
+  type UrlMapWire,
 } from '@/lib/navigation/url';
 
 /**
@@ -38,8 +40,16 @@ export interface UrlMapHelpers {
  * @param props.value - Mapping produced on the server by `getUrlMap()`
  * @param props.children - Subtree that may consume the mapping
  */
-export function UrlMapProvider({ value, children }: { value: UrlMap; children: React.ReactNode }) {
-  return <UrlMapContext.Provider value={value}>{children}</UrlMapContext.Provider>;
+export function UrlMapProvider({
+  value,
+  children,
+}: {
+  value: UrlMapWire;
+  children: React.ReactNode;
+}) {
+  // Unpacked once per page; see `packUrlMap` for why it arrives packed.
+  const map = useMemo(() => unpackUrlMap(value), [value]);
+  return <UrlMapContext.Provider value={map}>{children}</UrlMapContext.Provider>;
 }
 
 /**

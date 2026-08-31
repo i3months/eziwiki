@@ -12,6 +12,7 @@ import { getSite } from '@/lib/site';
 import { themeCss } from '@/lib/theme';
 import { jsonLd } from '@/lib/seo/jsonLd';
 import { asset, fileUrl, pageUrl } from '@/lib/basePath';
+import { packUrlMap } from '@/lib/navigation/url';
 
 // Validate payload at build time
 const validation = validatePayload(payload);
@@ -212,7 +213,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {site.strings.skipToContent}
         </a>
         <StringsProvider value={site.strings}>
-          <UrlMapProvider value={site.urlMap}>
+          <UrlMapProvider value={packUrlMap(site.urlMap)}>
             <TabInitializer navigation={site.navigation} />
             <PageLayout navigation={site.navigation} repoUrl={site.global.repoUrl}>
               {children}

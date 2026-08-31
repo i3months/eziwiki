@@ -123,3 +123,39 @@ export function hrefFor(map: UrlMap, docPath: string | undefined): string {
   const url = docPathToUrl(map, docPath);
   return url ? `/${url}` : '/';
 }
+
+/**
+ * The map as it travels to the browser.
+ *
+ * Under the `path` strategy both halves of the map are the identity, and
+ * shipping them cost every page two copies of every content path — ninety
+ * bytes per page of the site, on every page of the site. The list of paths
+ * carries the same information, and `unpackUrlMap` rebuilds the map from it.
+ * Under `hash` the digests cannot be derived, so the map travels whole.
+ */
+export type UrlMapWire = UrlMap | { strategy: 'path'; paths: string[] };
+
+/**
+ * Packs a map for the browser.
+ *
+ * @param map - The build-time map
+ * @returns The compact form when the strategy allows it
+ */
+export function packUrlMap(map: UrlMap): UrlMapWire {
+  return map.strategy === 'path' ? { strategy: 'path', paths: Object.keys(map.toUrl) } : map;
+}
+
+/**
+ * Rebuilds a map from its wire form.
+ *
+ * @param wire - What `packUrlMap` produced
+ * @returns A map the helpers can read
+ */
+export function unpackUrlMap(wire: UrlMapWire): UrlMap {
+  if (!('paths' in wire)) return wire;
+
+  const identity: Record<string, string> = {};
+  for (const path of wire.paths) identity[path] = path;
+
+  return { strategy: 'path', toUrl: identity, toPath: identity };
+}

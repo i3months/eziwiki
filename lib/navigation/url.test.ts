@@ -1,5 +1,13 @@
 import { describe, it, expect } from 'vitest';
-import { docPathToUrl, hrefFor, normalizeSlug, urlToDocPath, type UrlMap } from './url';
+import {
+  docPathToUrl,
+  hrefFor,
+  normalizeSlug,
+  packUrlMap,
+  unpackUrlMap,
+  urlToDocPath,
+  type UrlMap,
+} from './url';
 import { buildUrlMap } from './urlMap';
 
 const PATHS = ['intro', 'guides/quick-start', 'guides/nested/deep'];
@@ -99,5 +107,22 @@ describe('hrefFor', () => {
     // slash.
     expect(hrefFor(map, '/graph/')).toBe('/graph/');
     expect(hrefFor(map, '/tags/deployment/')).toBe('/tags/deployment/');
+  });
+});
+
+describe('packUrlMap / unpackUrlMap', () => {
+  it('sends only the paths under the path strategy, and gets the same map back', () => {
+    const map = buildUrlMap(PATHS, 'path');
+    const wire = packUrlMap(map);
+
+    expect(wire).toEqual({ strategy: 'path', paths: PATHS });
+    expect(unpackUrlMap(wire)).toEqual(map);
+  });
+
+  it('sends the whole map under the hash strategy', () => {
+    const map = buildUrlMap(PATHS, 'hash');
+
+    expect(packUrlMap(map)).toBe(map);
+    expect(unpackUrlMap(packUrlMap(map))).toBe(map);
   });
 });
