@@ -1,6 +1,9 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+/** Entries a tab's history keeps; older ones fall off the front. */
+const MAX_HISTORY = 50;
+
 export interface HistoryEntry {
   path: string;
   title: string;
@@ -141,9 +144,13 @@ export const useTabStore = create<TabStore>()(
               return { ...tab, title, history: updatedHistory, historyIndex: index };
             }
 
-            // Remove any forward history and add new entry
+            // Remove any forward history and add new entry. Capped: the
+            // history is persisted, and a tab that has lived for months
+            // otherwise carries every page it ever showed.
             const newHistory = history.slice(0, index + 1);
             newHistory.push({ path, title });
+            if (newHistory.length > MAX_HISTORY)
+              newHistory.splice(0, newHistory.length - MAX_HISTORY);
 
             return {
               ...tab,
