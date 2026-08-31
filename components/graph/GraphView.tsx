@@ -2,7 +2,7 @@
 
 import React, { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { bounds, layout, type LayoutEdge } from '@/lib/graph/layout';
+import { bounds, layout, type LayoutEdge, type LayoutNode } from '@/lib/graph/layout';
 import { useStrings } from '@/components/providers/StringsProvider';
 import { format } from '@/lib/i18n/format';
 
@@ -26,6 +26,13 @@ export interface GraphViewNode {
 interface GraphViewProps {
   nodes: GraphViewNode[];
   edges: LayoutEdge[];
+  /**
+   * Positions computed ahead of time. The layout is O(N²) per iteration and
+   * ran in the browser on every visit — eight seconds of blocked main thread
+   * at a thousand pages — so the whole-site graph computes it once, during
+   * the build, and passes it in. A small graph may leave it out.
+   */
+  positions?: LayoutNode[];
   /** Page to mark as the one being read, when the graph is centred on one */
   activePath?: string;
   /** Height utility class; the default suits a full page of its own */
@@ -39,20 +46,44 @@ const AREA = { width: 900, height: 640 };
 const MIN_RADIUS = 5;
 const MAX_RADIUS = 14;
 
-export function GraphView({ nodes, edges, activePath, heightClass = 'h-[70vh]' }: GraphViewProps) {
+export function GraphView({
+  nodes,
+  edges,
+  activePath,
+  heightClass = 'h-[70vh]',
+  positions: precomputed,
+}: GraphViewProps) {
   const router = useRouter();
   const [hovered, setHovered] = useState<string | null>(null);
   const t = useStrings();
 
   const positions = useMemo(() => {
-    const settled = layout(
-      nodes.map((node) => node.path),
-      edges,
-      AREA,
-    );
+    const settled =
+      precomputed ??
+      layout(
+        nodes.map((node) => node.path),
+        edges,
+        AREA,
+      );
 
     return new Map(settled.map((node) => [node.id, node]));
-  }, [nodes, edges]);
+  }, [nodes, edges, precomputed]);
+
+  // Neighbours per node, built once: scanning every edge on every hover was
+  // fine at fifty links and not at fifteen thousand.
+  const neighbours = useMemo(() => {
+    const map = new Map<string, Set<string>>();
+    const add = (a: string, b: string) => {
+      const set = map.get(a) ?? new Set<string>();
+      set.add(b);
+      map.set(a, set);
+    };
+    for (const edge of edges) {
+      add(edge.from, edge.to);
+      add(edge.to, edge.from);
+    }
+    return map;
+  }, [edges]);
 
   const box = useMemo(() => bounds([...positions.values()]), [positions]);
 
@@ -62,13 +93,8 @@ export function GraphView({ nodes, edges, activePath, heightClass = 'h-[70vh]' }
   const connected = useMemo(() => {
     if (!hovered) return null;
 
-    const set = new Set<string>([hovered]);
-    for (const edge of edges) {
-      if (edge.from === hovered) set.add(edge.to);
-      if (edge.to === hovered) set.add(edge.from);
-    }
-    return set;
-  }, [hovered, edges]);
+    return new Set<string>([hovered, ...(neighbours.get(hovered) ?? [])]);
+  }, [hovered, neighbours]);
 
   if (nodes.length === 0) {
     return (

@@ -1,6 +1,7 @@
 import { GraphView } from '@/components/graph/GraphView';
 import { PageTransition } from '@/components/markdown/PageTransition';
 import { getLinkGraph } from '@/lib/graph/build';
+import { layout } from '@/lib/graph/layout';
 import { getWantedPages } from '@/lib/graph/health';
 import { format } from '@/lib/i18n/strings';
 import { formatNodes } from '@/lib/i18n/nodes';
@@ -32,8 +33,17 @@ export function generateMetadata(): Metadata {
   };
 }
 
+/** Nominal layout area, matching what the view would use on its own. */
+const AREA = { width: 900, height: 640 };
+
 export default function GraphPage() {
   const { nodes, edges, broken } = getLinkGraph();
+  // Laid out here, once, rather than in every reader's browser.
+  const positions = layout(
+    nodes.map((node) => node.path),
+    edges,
+    AREA,
+  );
   const linked = nodes.filter((node) => node.degree > 0).length;
   const t = getStrings();
   const wanted = getWantedPages();
@@ -55,7 +65,7 @@ export default function GraphPage() {
         </p>
       </div>
 
-      <GraphView nodes={nodes} edges={edges} />
+      <GraphView nodes={nodes} edges={edges} positions={positions} />
 
       {ambiguous.length > 0 && (
         <section className="mt-8">
