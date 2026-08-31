@@ -31,25 +31,26 @@ global: {
 }
 ```
 
-### 2. Update next.config.js
+### 2. Tell the build where the site lives
 
-```javascript
-const nextConfig = {
-  output: 'export',
-  basePath: '/your-repo', // Your repository name
-  images: {
-    unoptimized: true,
-  },
-};
+A project site is served from `https://yourusername.github.io/your-repo/`, so
+every path the build emits needs the `/your-repo` prefix. That prefix is read
+from an environment variable at build time — nothing in `next.config.js` needs
+editing, and the same project builds for the domain root when the variable is
+unset:
 
-module.exports = nextConfig;
+```bash
+NEXT_PUBLIC_BASE_PATH=/your-repo npm run build
 ```
+
+A user site (`yourusername.github.io`) is served from the root and needs no
+prefix.
 
 ### 3. Build and Deploy
 
 ```bash
 # Build the site
-npm run build
+NEXT_PUBLIC_BASE_PATH=/your-repo npm run build
 
 # Deploy to gh-pages branch
 npx gh-pages -d out
@@ -59,7 +60,9 @@ npx gh-pages -d out
 
 ### Using GitHub Actions
 
-Create `.github/workflows/deploy.yml`:
+A project created with `npx create-eziwiki` already carries
+`.github/workflows/deploy.yml`, which does all of this on every push to
+`main`. If yours does not, create it:
 
 ```yaml
 name: Deploy to GitHub Pages
@@ -74,29 +77,60 @@ permissions:
   pages: write
   id-token: write
 
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      # Full history: pages are dated from the commit that last touched them,
+      # and a shallow clone cannot say.
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
           cache: 'npm'
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
 
       - name: Install dependencies
         run: npm ci
 
+      # A project site lives under /<repository>; a user site at the root.
+      - name: Resolve base path
+        id: base
+        run: |
+          # A repository variable BASE_PATH overrides the guess — set it to
+          # "/" for a project site on a custom domain, which is served from
+          # the root of that domain.
+          if [ -n "${{ vars.BASE_PATH }}" ]; then
+            p="${{ vars.BASE_PATH }}"
+            [ "$p" = "/" ] && p=""
+            echo "path=$p" >> "$GITHUB_OUTPUT"
+          else
+            case "${{ github.event.repository.name }}" in
+              *.github.io) echo "path=" >> "$GITHUB_OUTPUT" ;;
+              *) echo "path=/${{ github.event.repository.name }}" >> "$GITHUB_OUTPUT" ;;
+            esac
+          fi
+
       - name: Build
         run: npm run build
+        env:
+          NEXT_PUBLIC_BASE_PATH: ${{ steps.base.outputs.path }}
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v2
+        uses: actions/upload-pages-artifact@v3
         with:
-          path: ./out
+          path: out
 
   deploy:
     environment:
@@ -107,7 +141,7 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v2
+        uses: actions/deploy-pages@v4
 ```
 
 ### Enable GitHub Pages
@@ -168,23 +202,22 @@ CNAME   wiki    yourusername.github.io
 
 - URL: `https://username.github.io/repo-name`
 - Any repository
-- Requires `basePath` in config
+- Build with `NEXT_PUBLIC_BASE_PATH=/repo-name`
 
 ### User Site
 
 - URL: `https://username.github.io`
 - Repository must be named `username.github.io`
-- No `basePath` needed
+- No base path
 
 ## Troubleshooting
 
 ### 404 Error
 
-Make sure `basePath` in `next.config.js` matches your repository name:
-
-```javascript
-basePath: '/your-repo',  // Must match repo name
-```
+Make sure the base path the site was built with matches the repository name —
+`NEXT_PUBLIC_BASE_PATH=/your-repo`, with the leading slash and nothing after.
+The workflow above derives it from the repository, so a renamed repository
+picks up the new name on the next deploy.
 
 ### Assets Not Loading
 
@@ -253,24 +286,13 @@ git push origin gh-pages
 git checkout main
 ```
 
-## Environment-Specific Config
+## Custom Domain and the Base Path
 
-Use environment variables:
-
-```javascript
-// next.config.js
-const isProd = process.env.NODE_ENV === 'production';
-
-const nextConfig = {
-  output: 'export',
-  basePath: isProd ? '/your-repo' : '',
-  images: {
-    unoptimized: true,
-  },
-};
-
-module.exports = nextConfig;
-```
+A project site on a custom domain is served from the root of that domain, so
+build it without a base path — leave `NEXT_PUBLIC_BASE_PATH` unset, and set
+`baseUrl` in `payload/config.ts` to the domain. With the workflow above, set a
+repository variable `BASE_PATH` to `/` (Settings → Secrets and variables →
+Actions → Variables) and the guess from the repository name is skipped.
 
 ## Best Practices
 
