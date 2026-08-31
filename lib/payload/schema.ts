@@ -8,6 +8,7 @@ export const payloadSchema = {
   properties: {
     global: {
       type: 'object',
+      additionalProperties: false,
       required: ['title', 'description'],
       properties: {
         title: { type: 'string', minLength: 1 },
@@ -76,6 +77,7 @@ export const payloadSchema = {
     },
     documents: {
       type: 'object',
+      additionalProperties: false,
       properties: {
         raster: {
           type: 'array',
@@ -85,6 +87,7 @@ export const payloadSchema = {
     },
     theme: {
       type: 'object',
+      additionalProperties: false,
       properties: {
         primary: { type: 'string', pattern: '^#[0-9A-Fa-f]{6}$' },
         secondary: { type: 'string', pattern: '^#[0-9A-Fa-f]{6}$' },
