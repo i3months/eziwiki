@@ -6,7 +6,7 @@
 <p align="center"><em><strong>A modern, lightweight wiki and documentation generator</strong></em></p>
 
 <p align="center">
-  <a href="https://i3months.com">🌐 Live Demo</a> •
+  <a href="https://i3months.com">🌐 A site built with it</a> •
   <a href="https://eziwiki.vercel.app">🌐 Demo (Vercel)</a> •
   <a href="https://i3months.github.io/eziwiki">🌐 Demo (GitHub Pages)</a>
 </p>
@@ -66,6 +66,30 @@ way, since they are written as content paths and resolved at build time.
 Navigation also became optional: pages under `content/` are now discovered
 automatically. An existing `navigation` array keeps working unchanged.
 
+### Updating the engine
+
+`npx create-eziwiki` copies the engine — `app/`, `components/`, `lib/`,
+`styles/`, `scripts/` and the root config files — into your project, so an
+update is a copy too. Your own work lives in `content/`, `payload/` and
+`public/`, and the engine directories are best left unedited so they can be
+replaced whole.
+
+The release a project came from is recorded in its `package.json` under
+`eziwiki.version`. To update:
+
+```bash
+npx create-eziwiki@latest fresh        # a new project beside yours
+rm -rf app components lib styles scripts
+cp -R fresh/{app,components,lib,styles,scripts} .
+cp fresh/{next.config.js,tailwind.config.ts,tsconfig.json,vitest.config.ts,postcss.config.js,vercel.json} .
+npm install
+```
+
+Then read the [changelog](CHANGELOG.md) for the releases in between: before
+1.0, a key in `payload/config.ts`, a frontmatter field or a `_meta.json`
+setting may change, and every such change is listed there with what to do
+about it.
+
 ## Project Structure
 
 ```
@@ -113,6 +137,12 @@ export const payload: Payload = {
     repoUrl: 'https://github.com/you/your-wiki', // Optional; sidebar link and edit links
     urlStrategy: 'path', // 'path' (readable, SEO-friendly) | 'hash' (opaque)
     autoNavigation: true, // Discover content/ files not listed below
+    favicon: '/favicon.svg', // Optional; a file under public/
+    seo: {
+      // Optional. Shared as the site's card wherever a page sets no `ogImage`.
+      openGraph: { images: [{ url: '/og-image.svg', width: 1200, height: 630 }] },
+      twitter: { card: 'summary_large_image' },
+    },
   },
   // Optional. Omit it entirely and navigation is built from content/.
   navigation: [
@@ -159,14 +189,19 @@ Ordering and presentation can also come from the content itself:
 title: Quick Start # Sidebar label; falls back to the filename
 description: Get going in 5 minutes
 order: 1 # Sort weight within its directory
-hidden: true # Buildable and linkable, but absent from the sidebar
+icon: 🚀 # Shown before the label in the sidebar
+hidden: true # Unlisted, not private: built and linkable, absent from the sidebar (`nav: false` means the same)
+tags: [setup] # See Tags below
+aliases: [guides/start] # Former paths that should keep working; see Aliases below
+updated: 2026-03-14 # Overrides the commit date; see Last Updated below
+ogImage: /images/quick-start.png # Social card for this page
 ---
 ```
 
 **`_meta.json` (per directory):**
 
 ```json
-{ "name": "📚 Getting Started", "order": 1, "color": "#dbeafe" }
+{ "name": "Getting Started", "icon": "📚", "order": 1, "color": "#dbeafe", "hidden": false }
 ```
 
 **Basic page:**
@@ -672,16 +707,33 @@ exhaustive, since undeclared pages are still discovered and appended.
 ## Commands
 
 ```bash
-npm run dev              # Development server
-npm run build            # Build for production
+npm run dev              # Development server (rebuilds the search index and PDF assets first)
+npm run build            # Build for production into out/
 npm run validate:payload # Check configuration
-npm run check:links      # Report unresolved links and pages worth writing
+npm run check:links      # Report unresolved links and pages worth writing (--strict fails on them)
 npm run new <path>       # Create a page, frontmatter and all
 npm run build:search     # Regenerate the search index
+npm run build:pdfjs      # Stage the document viewer's assets under public/
+npm run build:pdf-images # Draw embedded PDFs' pages (needs @napi-rs/canvas)
 npm run show-urls        # List every page and its URL
 npm run build:template   # Rebuild the create-eziwiki template
-npm test                 # Run the test suite
+npm test                 # Run the test suite (test:watch to keep it running)
+npm run lint             # ESLint (lint:fix to repair)
+npm run format           # Prettier (format:check to only report)
+npm run type-check       # TypeScript
 ```
+
+## Security Model
+
+Everything under `content/` is trusted. Raw HTML in Markdown is passed through
+to the page as written — it is how a video or a frame is embedded — and that
+includes `<script>`. So whoever can merge content can run script on your
+readers, and a wiki that accepts pull requests should review a Markdown change
+the way it would review code. Titles, descriptions and section colours are
+escaped or validated on their way into the page, but the body is the author's.
+
+A hidden page is unlisted, not private: it is built, and anyone with the link
+can read it. See [SECURITY.md](SECURITY.md) for how to report a problem.
 
 ## Contributing
 
@@ -690,3 +742,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 ## License
 
 MIT License - see [LICENSE](LICENSE) for details.
+
+The interface is set in [Pretendard](https://github.com/orioncactus/pretendard),
+which is distributed under the SIL Open Font License 1.1; its licence text
+ships beside the font files in `public/fonts/Pretendard/`.

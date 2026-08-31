@@ -43,3 +43,10 @@ npm run new <path>       # Create a page, frontmatter and all
 npm run show-urls        # List every page and its URL
 npm test                 # Run the test suite
 ```
+
+## Security
+
+Everything under `content/` is trusted: raw HTML, scripts included, is passed
+through to the page. Review a Markdown pull request the way you would review
+code. A page marked `hidden` is unlisted, not private — anyone with the link
+can read it.
