@@ -1,8 +1,15 @@
 import { describe, it, expect } from 'vitest';
+import fs from 'fs';
+import path from 'path';
 import { renderDoc, renderMarkdown } from './render';
 
+// The pages are drawn by `npm run build:pdf-images`. On a checkout that has
+// not run it these tests are skipped, and say so, rather than passing on an
+// early return that asserted nothing.
+const drewPosters = fs.existsSync(path.join(process.cwd(), 'public', 'pdf-images', 'index.json'));
+
 describe('renderMarkdown', () => {
-  it('renders headings with anchor ids and collects them', async () => {
+  it.skipIf(!drewPosters)('renders headings with anchor ids and collects them', async () => {
     const { html, headings } = await renderMarkdown('# Title\n\n## Setup\n\n### Details\n');
 
     expect(html).toContain('id="setup"');
@@ -341,7 +348,6 @@ describe('document embeds', () => {
   // rather than asserting it always is.
   it('shows the first page as an image when the build drew one', async () => {
     const { html } = await renderMarkdown('![[sample.pdf]]\n');
-    if (!html.includes('ezw-pdf__poster')) return;
 
     expect(html).toMatch(/<img[^>]*class="ezw-pdf__poster[^"]*"/);
     expect(html).toContain('src="/pdf-images/documents/sample.pdf.1.webp"');
@@ -350,14 +356,13 @@ describe('document embeds', () => {
     expect(html).toMatch(/height="\d+"/);
   });
 
-  it('records the page count the poster build measured', async () => {
+  it.skipIf(!drewPosters)('records the page count the poster build measured', async () => {
     const { html } = await renderMarkdown('![[sample.pdf]]\n');
-    if (!html.includes('ezw-pdf__poster')) return;
 
     expect(html).toContain('data-pages="3"');
   });
 
-  it('records the size the build measured', async () => {
+  it.skipIf(!drewPosters)('records the size the build measured', async () => {
     const { html } = await renderMarkdown('![[sample.pdf]]\n');
 
     expect(html).toMatch(/data-size="[1-9]\d*"/);
@@ -386,7 +391,6 @@ describe('document embeds', () => {
   // shown as pictures of its pages and never reaches the viewer.
   it('shows a document named as a scan as images of its pages', async () => {
     const { html } = await renderMarkdown('![[field-notebook.pdf]]\n');
-    if (!html.includes('ezw-pdf--raster')) return;
 
     expect(html).toContain('class="ezw-pdf ezw-pdf--raster"');
     expect(html).toContain('src="/pdf-images/scans/field-notebook.pdf.1.webp"');
@@ -396,9 +400,8 @@ describe('document embeds', () => {
   // The absence is the feature: the client only ever looks for this attribute,
   // so without it pdf.js cannot be fetched by this figure under any
   // circumstance, and the pages are readable with script switched off.
-  it('leaves a scan with nothing for the viewer to attach to', async () => {
+  it.skipIf(!drewPosters)('leaves a scan with nothing for the viewer to attach to', async () => {
     const { html } = await renderMarkdown('![[field-notebook.pdf]]\n');
-    if (!html.includes('ezw-pdf--raster')) return;
 
     const figure = /<figure class="ezw-pdf ezw-pdf--raster"[\s\S]*?<\/figure>/.exec(html)?.[0];
     expect(figure).toBeDefined();
@@ -406,17 +409,15 @@ describe('document embeds', () => {
     expect(figure).toContain('href="/scans/field-notebook.pdf"');
   });
 
-  it('numbers a scan’s pages in their alt text', async () => {
+  it.skipIf(!drewPosters)('numbers a scan’s pages in their alt text', async () => {
     const { html } = await renderMarkdown('![[field-notebook.pdf]]\n');
-    if (!html.includes('ezw-pdf--raster')) return;
 
     expect(html).toContain('alt="Page 1 of 2"');
     expect(html).toContain('alt="Page 2 of 2"');
   });
 
-  it('lets the label name a scan in its header', async () => {
+  it.skipIf(!drewPosters)('lets the label name a scan in its header', async () => {
     const { html } = await renderMarkdown('![[field-notebook.pdf|Field notebook]]\n');
-    if (!html.includes('ezw-pdf--raster')) return;
 
     expect(html).toContain('>Field notebook</span>');
   });
