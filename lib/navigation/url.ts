@@ -81,8 +81,45 @@ export function docPathToUrl(map: UrlMap, docPath: string): string | null {
  * @returns The content path, or null when the segment matches no document
  */
 export function urlToDocPath(map: UrlMap, slug: string): string | null {
-  const normalized = normalizeSlug(slug);
+  const normalized = normalizeSlug(decodeUrlPath(slug));
   return map.toPath[normalized] ?? null;
+}
+
+/**
+ * Percent-encodes each segment of a URL path, leaving the slashes.
+ *
+ * A file named `issue #1.md` or `설치 방법.md` is a page whose URL segment
+ * carries a character that means something else in a URL — a fragment, a
+ * query, a space. Written raw into an href it was cut short or looked up
+ * under the wrong name. Applied wherever a segment becomes an href.
+ *
+ * @param url - URL segment as the map keys it
+ * @returns The same path, safe inside an href
+ */
+export function encodeUrlPath(url: string): string {
+  return url.split('/').map(encodeURIComponent).join('/');
+}
+
+/**
+ * Undoes `encodeUrlPath`, tolerating a path that was never encoded.
+ *
+ * Route params and `usePathname()` arrive percent-encoded for any character
+ * outside ASCII; the map is keyed by the raw name.
+ *
+ * @param url - A URL path, encoded or not
+ * @returns The raw path
+ */
+export function decodeUrlPath(url: string): string {
+  return url
+    .split('/')
+    .map((segment) => {
+      try {
+        return decodeURIComponent(segment);
+      } catch {
+        return segment;
+      }
+    })
+    .join('/');
 }
 
 /**
@@ -121,7 +158,7 @@ export function hrefFor(map: UrlMap, docPath: string | undefined): string {
   if (!docPath) return '/';
   if (isRoutePath(docPath)) return docPath;
   const url = docPathToUrl(map, docPath);
-  return url ? `/${url}` : '/';
+  return url ? `/${encodeUrlPath(url)}` : '/';
 }
 
 /**

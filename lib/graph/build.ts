@@ -10,6 +10,7 @@ import { headingSlugs, slugAnchor } from '../markdown/headings';
 import { resolveAsset } from '../content/assets';
 import { getAliasMap } from '../content/aliases';
 import { isReservedUrl } from '../navigation/routes';
+import { encodeUrlPath } from '../navigation/url';
 import { getSite } from '../site';
 import { cached, contentGeneration, stamp } from '../cache';
 
@@ -285,7 +286,7 @@ export function getLinkGraph(): LinkGraph {
   const nodes: GraphNode[] = visible.map((doc) => ({
     path: doc.path,
     title: doc.title,
-    url: `/${urlMap.toUrl[doc.path] ?? doc.path}`,
+    url: `/${encodeUrlPath(urlMap.toUrl[doc.path] ?? doc.path)}`,
     degree: degree.get(doc.path) ?? 0,
   }));
 

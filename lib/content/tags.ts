@@ -1,6 +1,6 @@
 import { getContentRegistry, type ContentDoc } from './registry';
 import { getSite } from '../site';
-import { docPathToUrl } from '../navigation/url';
+import { docPathToUrl, encodeUrlPath } from '../navigation/url';
 import { cached, contentGeneration, stamp } from '../cache';
 
 /**
@@ -72,7 +72,12 @@ function toTaggedPage(doc: ContentDoc): TaggedPage | null {
   const url = docPathToUrl(getSite().urlMap, doc.path);
   if (!url) return null;
 
-  return { path: doc.path, title: doc.title, url: `/${url}/`, description: doc.description };
+  return {
+    path: doc.path,
+    title: doc.title,
+    url: `/${encodeUrlPath(url)}/`,
+    description: doc.description,
+  };
 }
 
 /**

@@ -5,6 +5,8 @@ import {
   normalizeSlug,
   packUrlMap,
   unpackUrlMap,
+  encodeUrlPath,
+  decodeUrlPath,
   urlToDocPath,
   type UrlMap,
 } from './url';
@@ -124,5 +126,29 @@ describe('packUrlMap / unpackUrlMap', () => {
 
     expect(packUrlMap(map)).toBe(map);
     expect(unpackUrlMap(packUrlMap(map))).toBe(map);
+  });
+});
+
+// A file named `issue #1.md` or `설치 방법.md` is a page; its URL segment
+// carries characters that mean something else in a URL.
+describe('encodeUrlPath / decodeUrlPath', () => {
+  it('encodes each segment and keeps the slashes', () => {
+    expect(encodeUrlPath('zz/issue #1')).toBe('zz/issue%20%231');
+    expect(encodeUrlPath('설치 방법')).toBe(encodeURIComponent('설치 방법'));
+    expect(encodeUrlPath('guides/quick-start')).toBe('guides/quick-start');
+  });
+
+  it('decodes what the router hands over, and tolerates a raw path', () => {
+    expect(decodeUrlPath('zz/issue%20%231')).toBe('zz/issue #1');
+    expect(decodeUrlPath('100%')).toBe('100%');
+  });
+
+  it('looks a page up by its encoded or raw segment', () => {
+    const map = buildUrlMap(['zz/issue #1', '설치 방법'], 'path');
+
+    expect(urlToDocPath(map, '/zz/issue%20%231/')).toBe('zz/issue #1');
+    expect(urlToDocPath(map, '/zz/issue #1/')).toBe('zz/issue #1');
+    expect(urlToDocPath(map, `/${encodeURIComponent('설치 방법')}/`)).toBe('설치 방법');
+    expect(hrefFor(map, 'zz/issue #1')).toBe('/zz/issue%20%231');
   });
 });

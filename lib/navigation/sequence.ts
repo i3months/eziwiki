@@ -1,6 +1,6 @@
 import { getSite } from '../site';
 import { extractAllPaths, filterHiddenItems } from './builder';
-import { docPathToUrl } from './url';
+import { docPathToUrl, encodeUrlPath } from './url';
 import { getDoc } from '../content/registry';
 import { cached, contentGeneration, stamp } from '../cache';
 
@@ -98,5 +98,5 @@ function toAdjacent(path: string | undefined): AdjacentPage | null {
   const url = docPathToUrl(urlMap, path);
   if (!url) return null;
 
-  return { title: getDoc(path)?.title ?? path, url: `/${url}/` };
+  return { title: getDoc(path)?.title ?? path, url: `/${encodeUrlPath(url)}/` };
 }

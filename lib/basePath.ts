@@ -1,3 +1,4 @@
+import { decodeUrlPath, encodeUrlPath } from './navigation/url';
 /**
  * Base path the site is served from, empty when served from the root.
  *
@@ -104,5 +105,7 @@ export function fileUrl(path: string, payloadBaseUrl?: string): string {
 export function pageUrl(urlSegment: string, payloadBaseUrl?: string): string {
   const trimmed = urlSegment.replace(/^\/+|\/+$/g, '');
   const base = canonicalRoot(payloadBaseUrl);
-  return trimmed ? `${base}/${trimmed}/` : `${base}/`;
+  // Encoded here, once, for every canonical and sitemap entry. A segment
+  // that already arrived encoded is decoded first so it is not encoded twice.
+  return trimmed ? `${base}/${encodeUrlPath(decodeUrlPath(trimmed))}/` : `${base}/`;
 }

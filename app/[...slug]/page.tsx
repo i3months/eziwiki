@@ -43,10 +43,34 @@ interface PageProps {
  */
 function resolveSlug(slug: string[]): { path: string; url: string } | null {
   const { urlMap } = getSite();
-  const url = slug.join('/');
+  const url = decodeSegments(slug);
   const path = urlToDocPath(urlMap, url);
 
   return path ? { path, url } : null;
+}
+
+/**
+ * Joins route segments as the URL map keys them.
+ *
+ * The dev server hands the segments percent-encoded — `/한글-페이지/` arrives
+ * as `%ED%95%9C…` — while the export writes files by the raw name and the map
+ * is keyed by it. Undecoded, every non-ASCII page 404ed in the one tool its
+ * author writes with. A segment that is not valid percent-encoding is kept
+ * as written.
+ *
+ * @param slug - Route segments captured by the catch-all route
+ * @returns The URL segment, decoded
+ */
+function decodeSegments(slug: string[]): string {
+  return slug
+    .map((segment) => {
+      try {
+        return decodeURIComponent(segment);
+      } catch {
+        return segment;
+      }
+    })
+    .join('/');
 }
 
 /**
@@ -61,7 +85,7 @@ function resolveSlug(slug: string[]): { path: string; url: string } | null {
  */
 function resolveMoved(slug: string[]): { path: string; url: string } | null {
   const { urlMap } = getSite();
-  const path = resolveAliasUrl(slug.join('/'), urlMap.strategy);
+  const path = resolveAliasUrl(decodeSegments(slug), urlMap.strategy);
   if (!path) return null;
 
   const url = docPathToUrl(urlMap, path);

@@ -1,7 +1,7 @@
 import { visit } from 'unist-util-visit';
 import { toString } from 'hast-util-to-string';
 import type { Element, Root } from 'hast';
-import { docPathToUrl, type UrlMap } from '../navigation/url';
+import { docPathToUrl, type UrlMap, encodeUrlPath } from '../navigation/url';
 import { getStrings } from '../site';
 import { format } from '../i18n/format';
 import { parseCodeMeta } from './codeMeta';
@@ -179,7 +179,7 @@ export function rehypeInternalLinks(source: UrlMap | (() => UrlMap)) {
         // the form every page is exported under. Hosts that redirect the
         // slashless form cost a round trip per link; hosts that do not — a
         // plain object store, say — answer it with a 404.
-        node.properties.href = `/${url}/${suffix}`;
+        node.properties.href = `/${encodeUrlPath(url)}/${suffix}`;
       }
     });
   };

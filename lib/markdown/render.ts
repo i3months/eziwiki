@@ -40,7 +40,7 @@ import { resolveAsset } from '../content/assets';
 import { getPdfImages } from '../content/pdfImages';
 import { getExcerpt } from '../content/excerpt';
 import { headingSlugs, slugAnchor, type HeadingSlug } from './headings';
-import { docPathToUrl } from '../navigation/url';
+import { docPathToUrl, encodeUrlPath } from '../navigation/url';
 
 /**
  * Build-time Markdown rendering.
@@ -97,7 +97,7 @@ function resolveWikiLink(target: string): WikiLinkTarget | null {
   if (!url) return null;
 
   return {
-    url: `/${url}/`,
+    url: `/${encodeUrlPath(url)}/`,
     title: doc.title,
     excerpt: getExcerpt(doc.path),
   };
@@ -184,7 +184,7 @@ function resolveWikiTransclusion(target: string, anchor?: string): TranscludeTar
   const nodes = anchor ? sliceSection(tree.children, anchor) : tree.children;
   if (!nodes || nodes.length === 0) return null;
 
-  return { path: doc.path, url: `/${url}/`, title: doc.title, nodes };
+  return { path: doc.path, url: `/${encodeUrlPath(url)}/`, title: doc.title, nodes };
 }
 
 /**
