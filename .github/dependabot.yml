@@ -1,11 +1,14 @@
 # Weekly, grouped, so an update is one pull request rather than twenty. The
 # scaffolder ships a lockfile of its own, so its directory is watched too.
+# Actions are pinned to commits with the tag in a comment; Dependabot keeps
+# both in step.
 version: 2
 updates:
   - package-ecosystem: npm
     directory: /
     schedule:
       interval: weekly
+    open-pull-requests-limit: 3
     groups:
       dependencies:
         patterns: ['*']
@@ -13,7 +16,12 @@ updates:
     directory: /packages/create-eziwiki
     schedule:
       interval: weekly
+    open-pull-requests-limit: 2
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: weekly
+    open-pull-requests-limit: 2
+    groups:
+      actions:
+        patterns: ['*']

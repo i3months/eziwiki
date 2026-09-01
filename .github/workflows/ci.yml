@@ -5,6 +5,7 @@ on:
     branches: [main, develop]
   pull_request:
     branches: [main, develop]
+  workflow_dispatch:
 
 # Nothing here writes to the repository; the default token would let it.
 permissions:
@@ -19,13 +20,16 @@ jobs:
   quality:
     name: Lint, Format & Types
     runs-on: ubuntu-latest
+    # No job here takes more than a few minutes; a hung one held a runner
+    # for six hours before this.
+    timeout-minutes: 15
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '20'
           cache: 'npm'
@@ -47,6 +51,9 @@ jobs:
   test:
     name: Test (Node ${{ matrix.node }})
     runs-on: ubuntu-latest
+    # No job here takes more than a few minutes; a hung one held a runner
+    # for six hours before this.
+    timeout-minutes: 15
 
     # The floor the manifest declares, and the current LTS above it.
     strategy:
@@ -58,12 +65,12 @@ jobs:
       # the single-commit clone a checkout makes by default, since a shallow
       # clone is deliberately left undated.
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: ${{ matrix.node }}
           cache: 'npm'
@@ -77,13 +84,16 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+    # No job here takes more than a few minutes; a hung one held a runner
+    # for six hours before this.
+    timeout-minutes: 15
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '20'
           cache: 'npm'
@@ -100,7 +110,7 @@ jobs:
         run: npm run build
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: build-output
           path: out
@@ -109,6 +119,9 @@ jobs:
   scaffold:
     name: Scaffold a project and build it
     runs-on: ubuntu-latest
+    # No job here takes more than a few minutes; a hung one held a runner
+    # for six hours before this.
+    timeout-minutes: 15
 
     # The `create-eziwiki` template is generated from this repository's source
     # rather than committed, so nothing in the normal build exercises it. This
@@ -116,10 +129,10 @@ jobs:
     # catches a change here breaking the scaffolded output.
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '20'
           cache: 'npm'
