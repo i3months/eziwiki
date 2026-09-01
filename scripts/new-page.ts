@@ -85,8 +85,11 @@ function main(): void {
   // path has none to keep, so the filename is titled instead. It matters
   // because a wiki link resolves on the title, and `[[Deploying to Fly]]` finds
   // a page called "Deploying to Fly" more readably than "Deploying To Fly".
+  // The last segment only: `guides/Quick Start` is a page called "Quick
+  // Start" in guides, not a page called "guides/Quick Start".
+  const written = path.basename(args.target.trim());
   const title =
-    args.title ?? (args.target === docPath ? titleize(path.basename(docPath)) : args.target.trim());
+    args.title ?? (args.target === docPath ? titleize(path.basename(docPath)) : written);
   create(docPath, title);
 
   console.log(`\n✅ content/${docPath}.md\n`);
@@ -99,7 +102,8 @@ function main(): void {
   }
 
   console.log(`   Link to it with [[${docPath}]]`);
-  console.log('   Nothing else to do — it is published on the next build.\n');
+  console.log('   Nothing else to do — it shows on the next request in `npm run dev`,');
+  console.log('   and in search after the next build.\n');
 }
 
 main();
