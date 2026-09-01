@@ -1,4 +1,7 @@
 ---
+tags:
+  - toc
+  - navigation
 title: Table of Contents
 description: An automatic contents rail with scroll tracking on every page
 order: 3

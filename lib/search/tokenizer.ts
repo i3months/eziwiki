@@ -17,7 +17,7 @@ const CJK = /[ᄀ-ᇿ぀-ヿ㄰-㆏㐀-䶿一-鿿가-힯豈-﫿]/;
 /**
  * Whether a string consists entirely of CJK characters.
  */
-function isCjk(term: string): boolean {
+export function isCjk(term: string): boolean {
   return [...term].every((char) => CJK.test(char));
 }
 

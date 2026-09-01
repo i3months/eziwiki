@@ -204,7 +204,14 @@ export async function buildSearchIndex(): Promise<SearchIndex> {
       url: href,
       title: doc.title,
       description: doc.description,
-      body: markdownToText(preamble.markdown).slice(0, MAX_BODY_CHARS),
+      // The title heading is already the `title` field; left in the body it
+      // was indexed twice and opened every excerpt.
+      body: markdownToText(preamble.markdown.replace(/^ {0,3}# [^\n]*\n?/m, '')).slice(
+        0,
+        MAX_BODY_CHARS,
+      ),
+      slug: doc.segments[doc.segments.length - 1].replace(/[-_]/g, ''),
+      ...(doc.tags.length ? { tags: doc.tags.join(' ') } : {}),
     });
 
     sections.forEach((section, index) => {

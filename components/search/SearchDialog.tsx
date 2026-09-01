@@ -25,17 +25,29 @@ const DEBOUNCE_MS = 120;
  * Terms are matched case-insensitively and escaped before being put into a
  * pattern, so a query containing regex metacharacters cannot break the match.
  */
-function Highlighted({ text, query }: { text: string; query: string }) {
-  const terms = query
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean)
+function Highlighted({
+  text,
+  query,
+  matched = [],
+}: {
+  text: string;
+  query: string;
+  /** The document terms the search matched; see `SearchResult.terms` */
+  matched?: string[];
+}) {
+  // What the reader typed and what actually matched, longest first so that
+  // `배포하기` is marked whole rather than as `배포` and `하기`. Marking only
+  // the typed words left `설치를` — which never appears — unmarked, and a
+  // typo'd `linkz` with nothing marked at all.
+  const terms = [...new Set([...query.trim().split(/\s+/), ...matched])]
+    .filter((term) => term.length > 1 || /[가-힣]/.test(term))
+    .sort((a, b) => b.length - a.length)
     .map((term) => term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
 
   if (terms.length === 0) return <>{text}</>;
 
   const parts = text.split(new RegExp(`(${terms.join('|')})`, 'gi'));
-  const lowered = terms.map((term) => term.toLowerCase());
+  const lowered = terms.map((term) => term.toLowerCase().replace(/\\(.)/g, '$1'));
 
   return (
     <>
@@ -324,7 +336,11 @@ export function SearchDialog() {
 
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-sm font-medium text-gray-900 dark:text-gray-100">
-                      <Highlighted text={result.section ?? result.title} query={query} />
+                      <Highlighted
+                        text={result.section ?? result.title}
+                        query={query}
+                        matched={result.terms}
+                      />
                     </span>
 
                     {result.section && (
@@ -335,7 +351,7 @@ export function SearchDialog() {
 
                     {result.excerpt && (
                       <span className="mt-0.5 block line-clamp-2 text-xs text-gray-600 dark:text-gray-400">
-                        <Highlighted text={result.excerpt} query={query} />
+                        <Highlighted text={result.excerpt} query={query} matched={result.terms} />
                       </span>
                     )}
                   </span>

@@ -1,5 +1,5 @@
 import type MiniSearch from 'minisearch';
-import { tokenize } from './tokenizer';
+import { isCjk, tokenize } from './tokenizer';
 import { SEARCH_INDEX_PATH, SEARCH_INDEX_VERSION, type SearchDoc, type SearchIndex } from './types';
 
 /**
@@ -21,6 +21,12 @@ export interface SearchResult {
   section?: string;
   /** Body excerpt centred on the match */
   excerpt: string;
+  /**
+   * The document terms the query matched, for highlighting. The words the
+   * reader typed are not always in the text: `설치를` matches `설치`, and
+   * `linkz` matches `links`.
+   */
+  terms: string[];
 }
 
 /** Characters of context shown around a match. */
@@ -35,7 +41,7 @@ const MAX_RESULTS = 20;
  * A query naming a section should surface that section above pages that merely
  * mention the words in passing, so headings outrank body text substantially.
  */
-const BOOST = { title: 4, section: 3, description: 2, body: 1 };
+const BOOST = { title: 4, section: 3, slug: 3, tags: 2, description: 2, body: 1 };
 
 /**
  * Extra weight given to whole-page entries over the sections within them.
@@ -75,8 +81,8 @@ export async function createSearcher(index: SearchIndex): Promise<MiniSearch<Sea
 
   const searcher = new MiniSearchCtor<SearchDoc>({
     idField: 'id',
-    fields: ['title', 'section', 'description', 'body'],
-    storeFields: ['title', 'section', 'url', 'body'],
+    fields: ['title', 'section', 'slug', 'tags', 'description', 'body'],
+    storeFields: ['title', 'section', 'url', 'body', 'description'],
     // The same tokeniser must run over queries and documents, or a CJK query
     // would be split differently from the terms stored for a document.
     tokenize,
@@ -139,7 +145,13 @@ export function buildExcerpt(body: string, terms: string[]): string {
   const lower = body.toLowerCase();
   let at = -1;
 
-  for (const term of terms) {
+  // Longest term first: a Korean query also matches through its bigrams,
+  // and centring on `하기` when `배포하기` is in the text misses the point.
+  const byLength = [...terms].sort((a, b) => b.length - a.length);
+  const longest = byLength[0]?.length ?? 0;
+
+  for (const term of byLength) {
+    if (at !== -1 && term.length < longest) break;
     const found = lower.indexOf(term.toLowerCase());
     if (found !== -1 && (at === -1 || found < at)) at = found;
   }
@@ -166,6 +178,48 @@ export function buildExcerpt(body: string, terms: string[]): string {
  * results[0].url; // '/features/dark-mode'
  * ```
  */
+/**
+ * Shapes a query so a Korean word matches through any of its parts.
+ *
+ * The tokeniser expands `설치를` to `설치를`, `설치` and `치를`, and as a
+ * plain string those were required all together — so a document had to
+ * contain the bigram straddling the particle, and `설치를` found two entries
+ * where `설치` found five. Each word of three or more CJK characters becomes
+ * its own OR group; the words themselves still combine with AND. A whole-word
+ * match still ranks first, since MiniSearch scores by how many terms of the
+ * query matched.
+ *
+ * @param query - Trimmed user input
+ * @param combineWith - How the words combine
+ * @returns A MiniSearch query
+ */
+export function buildQuery(query: string, combineWith: 'AND' | 'OR'): Query {
+  const words = query.split(/\s+/).filter(Boolean);
+
+  return {
+    combineWith,
+    queries: words.map((word) =>
+      isCjk(word.toLowerCase()) && [...word].length > 2
+        ? { queries: [word], combineWith: 'OR' as const }
+        : word,
+    ),
+  };
+}
+
+/** A MiniSearch query: a string, or a tree of them. */
+type Query = string | { combineWith: 'AND' | 'OR'; queries: Query[] };
+
+/**
+ * How many edits a term may be off by.
+ *
+ * At one fifth of the length a three-letter term was allowed one edit, so
+ * `toc` matched `to` and `too` in two hundred and fifty places, none of
+ * them the contents rail. Terms shorter than four letters have to be exact.
+ */
+function fuzzyFor(term: string): number | false {
+  return term.length >= 4 ? 0.2 : false;
+}
+
 export async function search(query: string): Promise<SearchResult[]> {
   const trimmed = query.trim();
   if (!trimmed) return [];
@@ -175,25 +229,26 @@ export async function search(query: string): Promise<SearchResult[]> {
   const options = {
     boost: BOOST,
     prefix: true,
-    // Fuzziness is proportional to term length, so short terms stay exact and
-    // long ones tolerate a typo or two.
-    fuzzy: 0.2,
+    fuzzy: fuzzyFor,
     boostDocument: boostPages,
   };
 
-  const hits = searcher.search(trimmed, { ...options, combineWith: 'AND' as const });
+  const hits = searcher.search(buildQuery(trimmed, 'AND'), options);
 
   // An AND query that matches nothing is usually one stray word away from a
   // useful result, so fall back to OR rather than showing an empty list.
-  const results = hits.length
-    ? hits
-    : searcher.search(trimmed, { ...options, combineWith: 'OR' as const });
+  const results = hits.length ? hits : searcher.search(buildQuery(trimmed, 'OR'), options);
 
   return results.slice(0, MAX_RESULTS).map((hit) => ({
     id: String(hit.id),
     url: hit.url as string,
     title: hit.title as string,
     section: hit.section as string | undefined,
-    excerpt: buildExcerpt((hit.body as string) ?? '', hit.terms),
+    // A heading with nothing but subsections under it has no body; the
+    // page's description stands in rather than an empty line.
+    excerpt:
+      buildExcerpt((hit.body as string) ?? '', hit.terms) ||
+      ((hit.description as string | undefined) ?? ''),
+    terms: hit.terms,
   }));
 }

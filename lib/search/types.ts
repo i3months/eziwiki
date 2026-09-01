@@ -23,6 +23,14 @@ export interface SearchDoc {
   description?: string;
   /** Plain-text body of the page or section, used for matching and previews */
   body: string;
+  /**
+   * The page's file name run together — `wikilinks` for `wiki-links.md` —
+   * on the page entry only. What a reader types without the space or the
+   * hyphen matched nothing before.
+   */
+  slug?: string;
+  /** The page's tags, space-separated, on the page entry only */
+  tags?: string;
 }
 
 /** The generated index file, as served to the browser. */
@@ -34,7 +42,7 @@ export interface SearchIndex {
 }
 
 /** Current index format version. Bump when the SearchDoc shape changes. */
-export const SEARCH_INDEX_VERSION = 1;
+export const SEARCH_INDEX_VERSION = 2;
 
 /** Public path the generated index is served from. */
 export const SEARCH_INDEX_PATH = '/search-index.json';

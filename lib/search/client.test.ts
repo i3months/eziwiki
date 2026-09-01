@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, afterEach, vi } from 'vitest';
-import { buildExcerpt, search } from './client';
+import { buildExcerpt, buildQuery, search } from './client';
 import { buildSearchIndex } from './build';
 import { SEARCH_INDEX_PATH, type SearchIndex } from './types';
 
@@ -163,5 +163,46 @@ describe('search with Korean content', () => {
     // would never match — the bigram tokeniser is what makes this work.
     expect(searcher.search('위키', { prefix: true }).length).toBeGreaterThan(0);
     expect(searcher.search('문서', { prefix: true }).length).toBeGreaterThan(0);
+  });
+});
+
+describe('buildQuery', () => {
+  it('lets a Korean word match through any of its parts', () => {
+    // As a plain string the word's bigrams were all required, so `설치를`
+    // demanded the bigram straddling the particle and found almost nothing.
+    expect(buildQuery('vercel 배포를', 'AND')).toEqual({
+      combineWith: 'AND',
+      queries: ['vercel', { queries: ['배포를'], combineWith: 'OR' }],
+    });
+  });
+
+  it('leaves a two-character Korean word and Latin words as they are', () => {
+    expect(buildQuery('문서 wiki', 'AND')).toEqual({
+      combineWith: 'AND',
+      queries: ['문서', 'wiki'],
+    });
+  });
+});
+
+describe('search, the forms readers actually type', () => {
+  it('finds a page by its name run together', async () => {
+    // `wikilink` and `quickstart` used to find nothing at all.
+    expect((await search('wikilink'))[0]?.url).toBe('/features/wiki-links');
+    expect((await search('quickstart'))[0]?.url).toMatch(/quick-start/);
+  });
+
+  it('finds the contents rail by its abbreviation, through a tag', async () => {
+    expect((await search('toc'))[0]?.url).toBe('/features/table-of-contents');
+  });
+
+  it('does not let a three-letter term drift to other words', async () => {
+    // `toc` used to match `to` and `too` in two hundred places.
+    const results = await search('toc');
+    expect(results.every((r) => r.url.includes('table-of-contents'))).toBe(true);
+  });
+
+  it('reports the terms that matched, for highlighting', async () => {
+    const [first] = await search('linkz');
+    expect(first.terms).toContain('links');
   });
 });
