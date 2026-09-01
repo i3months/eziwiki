@@ -121,7 +121,9 @@ function readOrder(value: unknown): number {
  */
 function readBoolean(value: unknown): boolean {
   if (typeof value === 'boolean') return value;
-  if (typeof value === 'string') return value.toLowerCase() === 'true';
+  // YAML 1.1 read `yes` and `on` as true; the parser here does not, and an
+  // author who wrote `hidden: yes` got a visible page.
+  if (typeof value === 'string') return ['true', 'yes', 'on'].includes(value.trim().toLowerCase());
   return false;
 }
 
@@ -203,10 +205,20 @@ function readDirMeta(dirPath: string): DirMeta {
       // semicolon is a declaration of the author's choosing; only a colour
       // gets through.
       if (typeof meta.color === 'string' && !isSafeCssColor(meta.color)) delete meta.color;
+      // `"hidden": "false"` is a string, and a string is truthy: read as a
+      // boolean here so no reader downstream has to remember that.
+      if (meta.hidden !== undefined) meta.hidden = readBoolean(meta.hidden);
       return meta;
     }
     return {};
-  } catch {
+  } catch (error) {
+    // A malformed file is treated as absent rather than fatal, but silently
+    // absent meant a section losing its name, order and colour with nothing
+    // said. Not for a file that does not exist, which is the usual case.
+    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+      const reason = error instanceof Error ? error.message : String(error);
+      console.warn(`⚠️  ${path.relative(process.cwd(), metaPath)} could not be read: ${reason}`);
+    }
     return {};
   }
 }
@@ -262,14 +274,27 @@ function readDoc(filePath: string): ContentDoc | null {
     return null;
   }
 
-  const { data, content } = matter(raw);
-  const frontmatter = data as Record<string, unknown>;
-
   // Composed form throughout. A macOS volume hands back decomposed names —
   // 한글 as its jamo — while a keyboard, git, and a Linux checkout all produce
   // the composed form; without this a link typed to such a page resolved on
   // CI and not locally, and the page's URL differed between the two.
   const relative = path.relative(CONTENT_DIR, filePath).replace(/\\/g, '/').normalize('NFC');
+
+  let parsed: ReturnType<typeof matter>;
+  try {
+    // With an options object, so gray-matter does not cache: it stores the
+    // file before parsing, and after one failure the same input came back
+    // parsed as empty frontmatter — one error, then a page with `---` in
+    // its body and no sign anything was wrong.
+    parsed = matter(raw, {});
+  } catch (error) {
+    const reason = error instanceof Error ? error.message : String(error);
+    throw new Error(`content/${relative}: the frontmatter could not be read.\n${reason}`);
+  }
+
+  const { data, content } = parsed;
+  const frontmatter = data as Record<string, unknown>;
+
   const docPath = relative.replace(/\.md$/, '');
   const segments = docPath.split('/');
   const fileName = segments[segments.length - 1];
