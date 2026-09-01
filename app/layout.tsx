@@ -19,7 +19,11 @@ const validation = validatePayload(payload);
 if (!validation.valid) {
   console.error('❌ Payload validation failed:');
   validation.errors?.forEach((err) => console.error(`  - ${err}`));
-  throw new Error('Invalid payload configuration. Please fix the errors above.');
+  // The errors travel in the message too: the dev overlay shows only this
+  // string, and "see above" pointed at a terminal the author may not have.
+  throw new Error(
+    `payload/config.ts is invalid:\n${(validation.errors ?? []).map((err) => `  - ${err}`).join('\n')}`,
+  );
 }
 
 /**

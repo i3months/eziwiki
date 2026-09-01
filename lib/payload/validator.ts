@@ -48,7 +48,16 @@ export function validatePayload(payload: unknown): ValidationResult {
   if (!valid && validate.errors) {
     return {
       valid: false,
-      errors: validate.errors.map((err) => `${err.instancePath || 'root'} ${err.message}`),
+      // `theme.primary`, as the author wrote it, rather than ajv's
+      // `/theme/primary`. An unknown key names the key.
+      errors: validate.errors.map((err) => {
+        const at = err.instancePath.split('/').filter(Boolean);
+        if (err.keyword === 'additionalProperties') {
+          at.push(String((err.params as { additionalProperty: string }).additionalProperty));
+          return `${at.join('.')} is not a setting`;
+        }
+        return `${at.join('.') || 'config'} ${err.message}`;
+      }),
     };
   }
 
