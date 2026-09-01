@@ -9,7 +9,7 @@ import { renderDoc, renderMarkdown } from './render';
 const drewPosters = fs.existsSync(path.join(process.cwd(), 'public', 'pdf-images', 'index.json'));
 
 describe('renderMarkdown', () => {
-  it.skipIf(!drewPosters)('renders headings with anchor ids and collects them', async () => {
+  it('renders headings with anchor ids and collects them', async () => {
     const { html, headings } = await renderMarkdown('# Title\n\n## Setup\n\n### Details\n');
 
     expect(html).toContain('id="setup"');
@@ -346,7 +346,7 @@ describe('document embeds', () => {
   // The poster is drawn by `npm run build:posters`. It is absent on a checkout
   // that has not run it, so these describe what is emitted when it is there
   // rather than asserting it always is.
-  it('shows the first page as an image when the build drew one', async () => {
+  it.skipIf(!drewPosters)('shows the first page as an image when the build drew one', async () => {
     const { html } = await renderMarkdown('![[sample.pdf]]\n');
 
     expect(html).toMatch(/<img[^>]*class="ezw-pdf__poster[^"]*"/);
@@ -362,7 +362,7 @@ describe('document embeds', () => {
     expect(html).toContain('data-pages="3"');
   });
 
-  it.skipIf(!drewPosters)('records the size the build measured', async () => {
+  it('records the size the build measured', async () => {
     const { html } = await renderMarkdown('![[sample.pdf]]\n');
 
     expect(html).toMatch(/data-size="[1-9]\d*"/);
@@ -389,7 +389,7 @@ describe('document embeds', () => {
   // mid-prose becomes the most an inline position can carry: a link.
   // `documents.raster` in the payload names `scans/**`, so the demo scan is
   // shown as pictures of its pages and never reaches the viewer.
-  it('shows a document named as a scan as images of its pages', async () => {
+  it.skipIf(!drewPosters)('shows a document named as a scan as images of its pages', async () => {
     const { html } = await renderMarkdown('![[field-notebook.pdf]]\n');
 
     expect(html).toContain('class="ezw-pdf ezw-pdf--raster"');
