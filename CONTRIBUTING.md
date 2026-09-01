@@ -57,6 +57,30 @@ Examples:
 - `fix: handle missing frontmatter`
 - `docs: update README installation steps`
 
+## Releasing
+
+A release of `create-eziwiki` is a tag. Bump the version, tag it, push:
+
+```bash
+cd packages/create-eziwiki && npm version minor && cd ../..
+git push --follow-tags
+```
+
+The `Release` workflow checks the tag against the package version, rebuilds
+and tests the template, and publishes with provenance. It authenticates one
+of two ways, and one of them has to be set up once:
+
+- an `NPM_TOKEN` repository secret holding an npm automation token with
+  publish rights, or
+- [npm trusted publishing](https://docs.npmjs.com/trusted-publishers) for
+  this repository and workflow, in which case no token is needed and the
+  `NODE_AUTH_TOKEN` line in `release.yml` can go.
+
+Until one is configured the workflow fails at the publish step.
+
+Add a heading for the version to `CHANGELOG.md` before tagging; the
+_Unreleased_ section becomes that release's notes.
+
 ## Pull Requests
 
 We'll review your PR and provide feedback. Thanks for contributing!
