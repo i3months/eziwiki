@@ -6,6 +6,11 @@ Thanks for your interest in contributing! We welcome bug fixes, features, docume
 
 1. Fork and clone the repo
 2. Install dependencies: `npm install`
+   - The lockfile is written by npm 10, the version Node 20 and 22 ship with
+     and CI runs. npm 11 rewrites it differently — it drops the nested
+     `esbuild` that `vite` lists as optional, and npm 10's `npm ci` then
+     refuses the lock. If you are on npm 11, regenerate the lock with
+     `npx npm@10 install --package-lock-only` before committing it.
 3. Create a branch: `git checkout -b feature/your-feature`
 4. Make your changes
 5. Run checks: `npm run lint && npm run test && npm run build`

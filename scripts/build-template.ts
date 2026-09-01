@@ -115,6 +115,9 @@ const EXCLUDE_FILES = new Set([
   // no document with enough headings to satisfy them.
   'lib/content/llms.test.ts',
   'lib/markdown/headings.test.ts',
+  // Includes a section of the demo intro by its heading; the starter's
+  // intro has no such heading.
+  'lib/markdown/anchor.test.ts',
 ]);
 
 /** Directories never copied. */
