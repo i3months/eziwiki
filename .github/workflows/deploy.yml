@@ -27,7 +27,7 @@ jobs:
       # notices a shallow clone and dates nothing rather than that, so without
       # this the site would simply carry no dates.
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
