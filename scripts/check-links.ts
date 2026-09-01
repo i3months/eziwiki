@@ -64,6 +64,7 @@ function report(
 
 const ambiguous = broken.filter((link) => link.reason === 'ambiguous');
 const anchors = broken.filter((link) => link.reason === 'anchor');
+const files = broken.filter((link) => link.reason === 'file');
 
 if (broken.length > 0) {
   console.log(`\n🔗 ${broken.length} unresolved link${broken.length === 1 ? '' : 's'}\n`);
@@ -94,6 +95,17 @@ if (broken.length > 0) {
     console.log();
   }
 
+  if (files.length > 0) {
+    console.log('  Files — embedded, but not under public/:\n');
+
+    for (const link of files) {
+      console.log(`    content/${link.from}.md`);
+      console.log(`      ![[${link.target}]]`);
+    }
+
+    console.log();
+  }
+
   // A link to a page that does not exist is listed the other way round: by the
   // page being asked for, so that the report is a list of things to write
   // rather than a list of things that are wrong.
@@ -107,6 +119,7 @@ if (broken.length > 0) {
       const askers = page.wantedBy.length;
       console.log(`    [[${page.target}]] — wanted by ${askers} page${askers === 1 ? '' : 's'}`);
       for (const asker of page.wantedBy) console.log(`      content/${asker}.md`);
+      if (page.nearest) console.log(`      did you mean [[${page.nearest}]]?`);
       console.log(`      npm run new ${page.suggestedPath}`);
       console.log();
     }

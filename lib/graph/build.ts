@@ -43,7 +43,7 @@ export interface BrokenLink {
    * Why it failed: nothing matched, the shorthand matched several pages, or
    * the page exists and the heading named after `#` does not
    */
-  reason: 'missing' | 'ambiguous' | 'anchor';
+  reason: 'missing' | 'ambiguous' | 'anchor' | 'file';
   /** Matching paths, when the target was ambiguous */
   candidates?: string[];
 }
@@ -191,7 +191,17 @@ function scanDoc(doc: ContentDoc): { targets: Set<string>; broken: BrokenLink[] 
       // nor a broken reference, so it leaves the graph here. An embed that
       // names no such file falls through, matching the renderer, which treats
       // it as a link to a document.
-      if (link.embed && resolveAsset(link.target)) continue;
+      if (link.embed) {
+        if (resolveAsset(link.target)) continue;
+
+        // `![[diagram.png]]` names a file by its extension. Reported as a
+        // missing file: falling through made it a wanted page, and the
+        // check suggested `npm run new diagram-png`.
+        if (/\.[a-z0-9]{2,5}$/i.test(link.target)) {
+          broken.push({ from: doc.path, target: link.target, reason: 'file' });
+          continue;
+        }
+      }
 
       const resolution = resolveTarget(link.target);
 

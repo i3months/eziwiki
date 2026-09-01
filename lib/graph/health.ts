@@ -1,5 +1,6 @@
 import { getLinkGraph, type GraphNode } from './build';
 import { normalizeTarget } from '../content/resolver';
+import { getContentRegistry } from '../content/registry';
 import { getReadingOrder } from '../navigation/sequence';
 import { cached, contentGeneration, stamp } from '../cache';
 
@@ -32,6 +33,8 @@ export interface WantedPage {
   wantedBy: string[];
   /** Suggested content path for the page, derived from the target */
   suggestedPath: string;
+  /** An existing page the target may have meant, when one is close enough */
+  nearest?: string;
 }
 
 let memo: WikiHealth | null = null;
@@ -121,6 +124,62 @@ export function suggestPath(target: string): string {
  * // [{ target: 'Deploying', wantedBy: ['intro', 'vercel'], suggestedPath: 'deploying' }]
  * ```
  */
+/**
+ * Edit distance between two strings, for telling a typo from a new page.
+ */
+function distance(a: string, b: string): number {
+  const rows = Array.from({ length: a.length + 1 }, (_, i) => [i]);
+  for (let j = 1; j <= b.length; j++) rows[0][j] = j;
+
+  for (let i = 1; i <= a.length; i++) {
+    for (let j = 1; j <= b.length; j++) {
+      rows[i][j] = Math.min(
+        rows[i - 1][j] + 1,
+        rows[i][j - 1] + 1,
+        rows[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1),
+      );
+    }
+  }
+
+  return rows[a.length][b.length];
+}
+
+/**
+ * The existing page a target most likely meant, when one is close.
+ *
+ * `[[quik-start]]` used to be answered with `npm run new quik-start` — an
+ * invitation to create a second Quick Start. A target within two edits of a
+ * page's name, title or path, or that one of them begins with, is offered
+ * as the correction instead.
+ *
+ * @param target - The unresolved target, as written
+ * @returns The content path of the nearest page, or undefined
+ */
+export function nearestPage(target: string): string | undefined {
+  const wanted = normalizeTarget(target);
+  if (wanted.length < 3) return undefined;
+
+  let best: { path: string; score: number } | undefined;
+
+  for (const doc of getContentRegistry().docs) {
+    const keys = [doc.path, doc.segments[doc.segments.length - 1], doc.title].map(normalizeTarget);
+
+    for (const key of keys) {
+      const score = key.startsWith(wanted) || wanted.startsWith(key) ? 1 : distance(wanted, key);
+      if (score > 2) continue;
+      if (
+        !best ||
+        score < best.score ||
+        (score === best.score && doc.path.length < best.path.length)
+      ) {
+        best = { path: doc.path, score };
+      }
+    }
+  }
+
+  return best?.path;
+}
+
 export function getWantedPages(): WantedPage[] {
   const hit = cached(wantedMemo, wantedStamp);
   if (hit) return hit;
@@ -139,10 +198,13 @@ export function getWantedPages(): WantedPage[] {
       continue;
     }
 
+    const nearest = nearestPage(link.target);
+
     wanted.set(key, {
       target: link.target,
       wantedBy: [link.from],
       suggestedPath: suggestPath(link.target),
+      ...(nearest ? { nearest } : {}),
     });
   }
 

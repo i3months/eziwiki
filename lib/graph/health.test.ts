@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { suggestPath, getWantedPages, getWikiHealth } from './health';
+import { suggestPath, getWantedPages, getWikiHealth, nearestPage } from './health';
 import { getLinkGraph } from './build';
 import { normalizeTarget } from '../content/resolver';
 
@@ -75,5 +75,18 @@ describe('getWikiHealth', () => {
       .map(([path]) => path);
 
     expect(missed).toEqual([]);
+  });
+});
+
+// A typo used to be answered with an invitation to create the page again.
+describe('nearestPage', () => {
+  it('offers the page a near miss meant', () => {
+    expect(nearestPage('intr')).toBe('intro');
+    expect(nearestPage('Intro ')).toBe('intro');
+  });
+
+  it('offers nothing for a target unlike any page', () => {
+    expect(nearestPage('zzqx-nonexistent-page')).toBeUndefined();
+    expect(nearestPage('ab')).toBeUndefined();
   });
 });
