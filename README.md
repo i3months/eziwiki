@@ -273,7 +273,9 @@ download it.
 
 Korean, Japanese, and Chinese content is indexed by character bigrams, so
 searching `위키` matches `위키문서를` — which whitespace tokenisation alone would
-miss.
+miss — and a query with a particle or an ending, `설치를` or `배포하는`, finds
+what the bare word finds. A page is also found by its file name run together
+(`wikilink`) and by its tags.
 
 ### Table of Contents
 

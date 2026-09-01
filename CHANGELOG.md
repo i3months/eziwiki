@@ -31,6 +31,24 @@ setting, and every such change is listed here with what to do about it.
   lockfile written by npm 11 was refused by npm 10. All three are fixed, and
   the lockfile rule is in CONTRIBUTING.
 
+### Search
+
+- A Korean word with a particle or an ending — `설치를`, `배포하는` — finds
+  what the bare word finds. It used to require every one of its bigrams,
+  including the one straddling the particle, and found almost nothing.
+- A page is found by its name run together (`wikilink`, `quickstart`) and by
+  its tags; a term shorter than four letters has to match exactly, so `toc`
+  no longer drifts to `to` and `too`.
+- The result list marks the words that matched, not only the words typed,
+  and a heading with no text of its own shows the page's description in
+  place of an empty line.
+
+### Continuous integration
+
+- Every action is pinned to a commit; Dependabot keeps the pins current and
+  sends the action updates as one pull request. Jobs time out at fifteen
+  minutes, and CI can be run by hand.
+
 ### Changed
 
 - **Node.js 20 or later is required.** The README said 18; the dependencies
