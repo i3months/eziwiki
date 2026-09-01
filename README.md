@@ -494,7 +494,9 @@ so the browser receives finished markup — no formula parser is downloaded and
 nothing reflows once the page settles.
 
 ```markdown
-The mass–energy relation is $E = mc^2$.
+The mass–energy relation is $E = mc^2$. A dollar sign that is not maths —
+"costs $5 and $10" — is written `\$5`, or the text between the two becomes an
+equation.
 
 $$
 \int_0^1 x^2 \, dx = \frac{1}{3}

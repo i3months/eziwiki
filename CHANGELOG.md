@@ -7,6 +7,30 @@ setting, and every such change is listed here with what to do about it.
 
 ## Unreleased
 
+### Fixed since the last entry
+
+- A page whose file name has a space or a character outside ASCII — every
+  Korean file name — was exported as a 404 page, with the build green. Its
+  address is now encoded wherever it becomes a link and decoded wherever it
+  comes back, in the export and in `npm run dev` alike. A name containing
+  `#`, `?` or `%` cannot be served by any host and is refused by
+  `validate:payload` with the file named.
+- Invalid YAML in one page's frontmatter stopped every command with a stack
+  trace and no file name, and on the next run came back as an empty page.
+  The error names the file.
+- `hidden: yes`, and `"hidden": "false"` in `_meta.json`, did the opposite
+  of what was written.
+- `check:links` suggests the page a typo'd link probably meant, and lists a
+  missing embedded file as a file rather than as a page to write.
+- `validate:payload` refuses an empty `content/` and a navigation entry that
+  names a page that does not exist, or names one twice, with a message that
+  says which; a bad config value is named as `theme.primary`, in the dev
+  overlay as well as the terminal.
+- CI had been failing on every push: the test job's shallow clone left pages
+  undated, a content-bound test shipped to scaffolded projects, and the
+  lockfile written by npm 11 was refused by npm 10. All three are fixed, and
+  the lockfile rule is in CONTRIBUTING.
+
 ### Changed
 
 - **Node.js 20 or later is required.** The README said 18; the dependencies
