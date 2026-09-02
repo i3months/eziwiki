@@ -1,12 +1,12 @@
+/* Imports first: the spec allows @import only before other rules, and
+   Turbopack's CSS parser holds the line webpack's did not. The theme
+   variables and the markdown styles load before Tailwind's layers. */
+@import '../styles/theme.css';
+@import '../styles/markdown.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Import theme CSS variables */
-@import '../styles/theme.css';
-
-/* Styles for build-time rendered Markdown */
-@import '../styles/markdown.css';
 
 /*
  * `@font-face` for Pretendard is declared in `app/layout.tsx`, not here: the
