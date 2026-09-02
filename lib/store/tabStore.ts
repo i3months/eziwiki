@@ -4,6 +4,27 @@ import { persist } from 'zustand/middleware';
 /** Entries a tab's history keeps; older ones fall off the front. */
 const MAX_HISTORY = 50;
 
+/**
+ * A fresh tab id.
+ *
+ * From the crypto source where there is one — `Math.random` is not meant to
+ * be unpredictable, and static analysers rightly point at it. Not
+ * `randomUUID`, which browsers withhold outside secure contexts, and a wiki
+ * on a plain-http intranet still needs tabs.
+ */
+function tabId(): string {
+  const bytes = new Uint8Array(6);
+  if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+    crypto.getRandomValues(bytes);
+  } else {
+    // nosemgrep -- last resort for environments without WebCrypto; the id
+    // only needs to be unique within one reader's tab strip.
+    for (let i = 0; i < bytes.length; i++) bytes[i] = Math.floor(Math.random() * 256);
+  }
+  const suffix = [...bytes].map((b) => b.toString(16).padStart(2, '0')).join('');
+  return `tab-${Date.now()}-${suffix}`;
+}
+
 export interface HistoryEntry {
   path: string;
   title: string;
@@ -110,7 +131,7 @@ export const useTabStore = create<TabStore>()(
         const newTab: Tab = {
           title: initialTitle,
           path: initialPath,
-          id: `tab-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+          id: tabId(),
           history: [{ path: initialPath, title: initialTitle }],
           historyIndex: 0,
         };
