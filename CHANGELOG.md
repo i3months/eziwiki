@@ -7,6 +7,15 @@ setting, and every such change is listed here with what to do about it.
 
 ## Unreleased
 
+### Major upgrades
+
+- **Next.js 16, React 19, pdf.js 6, ESLint 9.** Builds run on Turbopack —
+  the demo site's static generation went from forty seconds to four — and
+  the lint moved to a flat config. `pdfjs-dist@6` requires Node 22.13, and
+  Node 20 reached its end of life in April 2026, so that is the floor now:
+  `engines`, CI and the shipped workflows all say Node 22. These land the
+  dependency advisories that had been waiting on the majors.
+
 ### Fixed since the last entry
 
 - A page whose file name has a space or a character outside ASCII — every
