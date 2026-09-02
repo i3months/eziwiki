@@ -33,14 +33,14 @@ export function SearchTrigger({ className = '' }: { className?: string }) {
       type="button"
       onClick={open}
       aria-keyshortcuts="Meta+K Control+K"
-      className={`flex items-center gap-2 rounded-md border border-gray-300 bg-white px-2 py-1 text-sm text-gray-500 transition-colors hover:border-gray-400 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:border-gray-600 ${className}`}
+      className={`flex items-center gap-2 rounded-md border border-gray-300 bg-white px-2 py-1 text-sm text-gray-500 transition-colors hover:border-gray-400 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:border-gray-600 ${className}`}
     >
       <Search className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
       <span className="min-w-0 flex-1 truncate text-left">{t.search}</span>
       {shortcut && (
         <kbd
           aria-hidden="true"
-          className="hidden flex-shrink-0 rounded border border-gray-300 px-1 py-0.5 text-[10px] text-gray-500 sm:block dark:border-gray-600 dark:text-gray-400"
+          className="hidden flex-shrink-0 rounded border border-gray-300 px-1 py-0.5 text-[10px] text-gray-500 sm:block dark:border-gray-600 dark:text-gray-300"
         >
           {shortcut}
         </kbd>

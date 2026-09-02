@@ -338,7 +338,10 @@ export default async function ContentPage({ params }: PageProps) {
           <LocalGraph graph={getLocalGraph(resolved.path)} path={resolved.path} />
         </article>
 
-        <aside className="hidden w-56 flex-shrink-0 xl:block print:hidden">
+        <aside
+          aria-label={getSite().strings.onThisPage}
+          className="hidden w-56 flex-shrink-0 xl:block print:hidden"
+        >
           <div className="sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto">
             <TableOfContents headings={rendered.headings} />
           </div>

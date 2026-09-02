@@ -333,6 +333,7 @@ export function Sidebar({ navigation, repoUrl }: SidebarProps) {
 
   return (
     <aside
+      aria-label={t.navigation}
       ref={sidebarRef}
       className="hidden md:block print:hidden h-screen sticky top-0 bg-gray-50 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 overflow-y-auto relative"
       style={{

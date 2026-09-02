@@ -274,42 +274,46 @@ export function TabBar() {
       ref={tabBarRef}
       className="flex items-center gap-1 bg-gray-100 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 overflow-x-auto px-2 py-1 h-9 md:h-auto"
       style={{ scrollbarWidth: 'thin' }}
-      role="tablist"
-      aria-label={t.tabs}
     >
-      {tabs.map((tab, index) => {
-        const isActive = tab.id === activeTabId;
-        const isDragging = draggedIndex === index;
-        const showDropIndicator = dragOverIndex === index && !isDragging;
+      {/* The list holds only tabs — the "+" button, the drag ghost and the
+          menu live outside it. A tablist may contain nothing else, and the
+          wrappers that position the drop indicators are marked as
+          presentation for the same reason. */}
+      <div role="tablist" aria-label={t.tabs} className="flex items-center gap-1">
+        {tabs.map((tab, index) => {
+          const isActive = tab.id === activeTabId;
+          const isDragging = draggedIndex === index;
+          const showDropIndicator = dragOverIndex === index && !isDragging;
 
-        return (
-          <div key={tab.id} className="relative flex items-center">
-            {showDropIndicator && dropPosition === 'before' && (
-              <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 w-0.5 bg-blue-500 rounded-full z-10 shadow-lg shadow-blue-500/50" />
-            )}
+          return (
+            <div key={tab.id} role="presentation" className="relative flex items-center">
+              {showDropIndicator && dropPosition === 'before' && (
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 w-0.5 bg-blue-500 rounded-full z-10 shadow-lg shadow-blue-500/50" />
+              )}
 
-            <div
-              ref={(element) => {
-                if (element) tabRefs.current.set(tab.id, element);
-                else tabRefs.current.delete(tab.id);
-              }}
-              role="tab"
-              aria-selected={isActive}
-              tabIndex={isActive ? 0 : -1}
-              onKeyDown={(e) => handleTabKeyDown(e, index)}
-              draggable
-              onDragStart={(e) => handleDragStart(e, index)}
-              onDrag={handleDrag}
-              onDragOver={(e) => handleDragOver(e, index)}
-              onDragLeave={handleDragLeave}
-              onDrop={(e) => handleDrop(e, index)}
-              onDragEnd={handleDragEnd}
-              onClick={() => handleTabClick(tab.id, tab.path)}
-              onContextMenu={(e) => handleContextMenu(e, tab.id)}
-              style={{
-                cursor: isDragging ? 'grabbing' : 'grab',
-              }}
-              className={`
+              <div
+                ref={(element) => {
+                  if (element) tabRefs.current.set(tab.id, element);
+                  else tabRefs.current.delete(tab.id);
+                }}
+                role="tab"
+                aria-selected={isActive}
+                aria-keyshortcuts="Delete"
+                tabIndex={isActive ? 0 : -1}
+                onKeyDown={(e) => handleTabKeyDown(e, index)}
+                draggable
+                onDragStart={(e) => handleDragStart(e, index)}
+                onDrag={handleDrag}
+                onDragOver={(e) => handleDragOver(e, index)}
+                onDragLeave={handleDragLeave}
+                onDrop={(e) => handleDrop(e, index)}
+                onDragEnd={handleDragEnd}
+                onClick={() => handleTabClick(tab.id, tab.path)}
+                onContextMenu={(e) => handleContextMenu(e, tab.id)}
+                style={{
+                  cursor: isDragging ? 'grabbing' : 'grab',
+                }}
+                className={`
                 group flex items-center gap-3 px-3 py-1.5 rounded-md
                 transition-all duration-150 w-[180px] flex-shrink-0 relative h-8 md:h-auto
                 ${
@@ -319,37 +323,40 @@ export function TabBar() {
                 }
                 ${isDragging ? 'opacity-20' : 'opacity-100'}
               `}
-            >
-              <span className="flex-1 truncate text-sm font-medium min-w-0 pointer-events-none select-none pr-2">
-                {tab.title}
-              </span>
-              <button
-                onClick={(e) => handleTabClose(e, tab.id)}
-                className={`
-                  flex-shrink-0 w-5 h-5 min-w-[20px] min-h-[20px] max-md:w-6 max-md:h-6 max-md:min-w-[24px] max-md:min-h-[24px] flex items-center justify-center rounded hover:bg-gray-200 dark:hover:bg-gray-600
-                  transition-opacity
-                  ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 focus-visible:opacity-100'}
-                `}
-                tabIndex={-1}
-                aria-label={t.closeTab}
               >
-                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2.5}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
-            </div>
+                <span className="flex-1 truncate text-sm font-medium min-w-0 pointer-events-none select-none pr-2">
+                  {tab.title}
+                </span>
+                {/* A span, not a button: a tab may not contain another
+                  interactive control. The pointer still has its target; the
+                  keyboard closes with Delete, which the tab announces. */}
+                <span
+                  onClick={(e) => handleTabClose(e, tab.id)}
+                  aria-hidden="true"
+                  className={`
+                  flex-shrink-0 w-5 h-5 min-w-[20px] min-h-[20px] max-md:w-6 max-md:h-6 max-md:min-w-[24px] max-md:min-h-[24px] flex items-center justify-center rounded cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600
+                  transition-opacity
+                  ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}
+                `}
+                >
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2.5}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </span>
+              </div>
 
-            {showDropIndicator && dropPosition === 'after' && (
-              <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1 w-0.5 bg-blue-500 rounded-full z-10 shadow-lg shadow-blue-500/50" />
-            )}
-          </div>
-        );
-      })}
+              {showDropIndicator && dropPosition === 'after' && (
+                <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1 w-0.5 bg-blue-500 rounded-full z-10 shadow-lg shadow-blue-500/50" />
+              )}
+            </div>
+          );
+        })}
+      </div>
 
       {draggedIndex !== null && dragPosition && (
         <div
