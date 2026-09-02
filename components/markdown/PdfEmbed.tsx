@@ -13,7 +13,7 @@ import {
   Minus,
   Plus,
 } from 'lucide-react';
-import type { PDFDocumentProxy, RenderTask } from 'pdfjs-dist';
+import type { PDFDocumentLoadingTask, PDFDocumentProxy, RenderTask } from 'pdfjs-dist';
 import { useStrings } from '@/components/providers/StringsProvider';
 import { format, formatBytes } from '@/lib/i18n/format';
 import { asset } from '@/lib/basePath';
@@ -237,12 +237,12 @@ function PdfViewer({ src, name, size, pages: hinted }: PdfViewerProps) {
 
   useEffect(() => {
     let cancelled = false;
-    let opened: PDFDocumentProxy | null = null;
+    let task: PDFDocumentLoadingTask | null = null;
 
     (async () => {
       try {
         const mod = await loadPdfjs();
-        const task = mod.getDocument({
+        task = mod.getDocument({
           url: src,
           cMapUrl: asset(`${PDFJS_DATA}/cmaps/`),
           cMapPacked: true,
@@ -251,11 +251,10 @@ function PdfViewer({ src, name, size, pages: hinted }: PdfViewerProps) {
           wasmUrl: asset(`${PDFJS_DATA}/wasm/`),
         });
 
-        opened = await task.promise;
-        if (cancelled) {
-          void opened.destroy();
-          return;
-        }
+        // v6 moved `destroy` off the document and onto the loading task,
+        // which aborts the fetch and the worker together.
+        const opened = await task.promise;
+        if (cancelled) return;
 
         // Page one decides the shape every page is assumed to have until it
         // is drawn, and the natural width the fitting scale is measured from.
@@ -272,7 +271,7 @@ function PdfViewer({ src, name, size, pages: hinted }: PdfViewerProps) {
 
     return () => {
       cancelled = true;
-      void opened?.destroy();
+      void task?.destroy();
     };
   }, [src]);
 
@@ -669,6 +668,9 @@ export function PdfEmbeds() {
       image?.remove();
     }
 
+    // This effect exists to read the server-rendered figures, which are only
+    // in the DOM after render — the one job the rule's exceptions describe.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setEmbeds(found);
 
     return () => setEmbeds([]);

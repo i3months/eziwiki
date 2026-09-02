@@ -26,9 +26,10 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 
 interface PageProps {
-  params: {
+  /** Next 15 turned route params into a promise; awaited where used */
+  params: Promise<{
     slug: string[];
-  };
+  }>;
 }
 
 /**
@@ -96,12 +97,13 @@ function resolveMoved(slug: string[]): { path: string; url: string } | null {
  * Generates per-page metadata from the document's frontmatter.
  */
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params;
   const { global, hiddenPaths } = getSite();
-  const resolved = resolveSlug(params.slug);
+  const resolved = resolveSlug(slug);
   const doc = resolved ? getDoc(resolved.path) : undefined;
 
   if (!resolved || !doc) {
-    const moved = resolveMoved(params.slug);
+    const moved = resolveMoved(slug);
     const target = moved ? getDoc(moved.path) : undefined;
 
     // A former address should not compete with the page it forwards to: it is
@@ -307,10 +309,11 @@ function BreadcrumbSchema({ path }: { path: string }) {
  * screens wide enough to carry a second column.
  */
 export default async function ContentPage({ params }: PageProps) {
-  const resolved = resolveSlug(params.slug);
+  const { slug } = await params;
+  const resolved = resolveSlug(slug);
 
   if (!resolved) {
-    const moved = resolveMoved(params.slug);
+    const moved = resolveMoved(slug);
     const target = moved ? getDoc(moved.path) : undefined;
 
     if (moved && target) return <MovedPage url={`/${moved.url}/`} title={target.title} />;

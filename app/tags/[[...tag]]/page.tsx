@@ -6,7 +6,8 @@ import { getSite } from '@/lib/site';
 import { pageUrl } from '@/lib/basePath';
 
 interface PageProps {
-  params: { tag?: string[] };
+  /** Next 15 turned route params into a promise; awaited where used */
+  params: Promise<{ tag?: string[] }>;
 }
 
 /**
@@ -22,14 +23,15 @@ export async function generateStaticParams() {
 }
 
 /** The tag a route names, or null when the route is the index. */
-function resolveTag(params: PageProps['params']): Tag | null {
-  const [slug] = params.tag ?? [];
+function resolveTag(tag: string[] | undefined): Tag | null {
+  const [slug] = tag ?? [];
   return slug ? getTag(slug) : null;
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { tag: segments } = await params;
   const { global } = getSite();
-  const [slug] = params.tag ?? [];
+  const [slug] = segments ?? [];
 
   if (!slug) {
     const canonical = pageUrl('tags', global.baseUrl);
@@ -66,11 +68,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
  * other. A page belongs to one section and to as many subjects as it touches,
  * and only this view can say so.
  */
-export default function TagsPage({ params }: PageProps) {
-  const [slug] = params.tag ?? [];
+export default async function TagsPage({ params }: PageProps) {
+  const { tag: segments } = await params;
+  const [slug] = segments ?? [];
 
   if (slug) {
-    const tag = resolveTag(params);
+    const tag = resolveTag(segments);
     if (!tag) notFound();
 
     return (

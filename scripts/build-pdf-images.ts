@@ -296,11 +296,12 @@ async function main() {
     const data = new Uint8Array(await fs.readFile(source));
 
     try {
-      const doc = await pdfjs.getDocument({
+      const task = pdfjs.getDocument({
         data,
         standardFontDataUrl,
         CanvasFactory: NodeCanvasFactory,
-      }).promise;
+      });
+      const doc = await task.promise;
       const count = mode === 'raster' ? doc.numPages : 1;
       const width = mode === 'raster' ? RASTER_WIDTH : POSTER_WIDTH;
       const images: DrawnPage[] = [];
@@ -352,7 +353,8 @@ async function main() {
       }
 
       manifest[relative] = { mode, pages: doc.numPages, images, source: modified };
-      await doc.destroy();
+      // v6 moved `destroy` onto the loading task.
+      await task.destroy();
       drawn += 1;
     } catch (error) {
       // One unreadable document is not a reason to fail the build. It gets no

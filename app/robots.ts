@@ -2,6 +2,9 @@ import { MetadataRoute } from 'next';
 import { payload } from '@/payload/config';
 import { fileUrl } from '@/lib/basePath';
 
+// Next 16 wants the intent stated even under `output: export`.
+export const dynamic = 'force-static';
+
 /**
  * Generates robots.txt.
  *

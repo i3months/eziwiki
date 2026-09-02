@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { bounds, layout, type LayoutEdge, type LayoutNode } from '@/lib/graph/layout';
 import { useStrings } from '@/components/providers/StringsProvider';
