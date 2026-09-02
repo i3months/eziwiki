@@ -105,16 +105,26 @@ export function SearchDialog() {
     return () => document.removeEventListener('keydown', handler);
   }, [toggle, close]);
 
-  // Reset and focus each time the dialog opens.
+  // Reset each time the dialog opens — during render, as React advises for
+  // state that follows another piece of state, so the stale query is never
+  // painted at all.
+  const [wasOpen, setWasOpen] = useState(false);
+  if (isOpen !== wasOpen) {
+    setWasOpen(isOpen);
+    if (isOpen) {
+      setQuery('');
+      setResults([]);
+      setSelected(0);
+      setError(null);
+      setIsLoading(false);
+    }
+  }
+
+  // Focus the field on open, and give focus back on close.
   useEffect(() => {
     if (!isOpen) return;
 
     const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-
-    setQuery('');
-    setResults([]);
-    setSelected(0);
-    setError(null);
 
     // Focus after paint, or the input is not yet mounted.
     const raf = requestAnimationFrame(() => inputRef.current?.focus());
@@ -140,19 +150,15 @@ export function SearchDialog() {
   }, [isOpen]);
 
   // Run the query, debounced, discarding responses that arrive out of order.
+  // The loading flag is set where the query is typed, so this effect only
+  // owns the asynchronous part.
   useEffect(() => {
     if (!isOpen) return;
 
     const trimmed = query.trim();
-
-    if (!trimmed) {
-      setResults([]);
-      setIsLoading(false);
-      return;
-    }
+    if (!trimmed) return;
 
     let cancelled = false;
-    setIsLoading(true);
 
     const timer = setTimeout(async () => {
       try {
@@ -275,7 +281,17 @@ export function SearchDialog() {
             ref={inputRef}
             type="text"
             value={query}
-            onChange={(event) => setQuery(event.target.value)}
+            onChange={(event) => {
+              const value = event.target.value;
+              setQuery(value);
+              // Owned here rather than by the effect: synchronous state
+              // belongs to the event, the effect keeps only the timer.
+              setIsLoading(Boolean(value.trim()));
+              if (!value.trim()) {
+                setResults([]);
+                setSelected(0);
+              }
+            }}
             placeholder={t.searchPlaceholder}
             aria-label={t.searchQuery}
             role="combobox"

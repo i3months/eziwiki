@@ -249,10 +249,10 @@ export function MobileMenu({ navigation, isOpen, onClose, repoUrl }: MobileMenuP
   // Rendered from the start it was in every page's HTML — the whole
   // navigation a second time, behind a drawer that is closed and, from `md`
   // up, does not exist — which at a thousand pages was half the page.
+  // Adjusted during render rather than in an effect: opened, the drawer
+  // should have its tree in the same paint.
   const [hasOpened, setHasOpened] = useState(false);
-  useEffect(() => {
-    if (isOpen) setHasOpened(true);
-  }, [isOpen]);
+  if (isOpen && !hasOpened) setHasOpened(true);
 
   // Focus follows the drawer: into it when it opens, back to whatever opened
   // it when it closes, and Escape closes it. Without this a keyboard or
@@ -298,10 +298,8 @@ export function MobileMenu({ navigation, isOpen, onClose, repoUrl }: MobileMenuP
         // Slid off-screen is not gone: closed, the drawer stayed in the tab
         // order, and focus walked through every link off the left edge of
         // the screen before reaching the article. `inert` takes it out of
-        // both the tab order and the accessibility tree. React 18 knows the
-        // attribute only as a string — `true` would be dropped with a warning
-        // — while its types know it only as a boolean, hence the cast.
-        {...((isOpen ? {} : { inert: '' }) as React.HTMLAttributes<HTMLDivElement>)}
+        // both the tab order and the accessibility tree.
+        inert={!isOpen}
         className={`fixed top-0 left-0 h-full w-80 max-w-[85vw] bg-white dark:bg-gray-900 z-50 transform transition-transform duration-300 ease-in-out md:hidden print:hidden ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         } overflow-y-auto`}

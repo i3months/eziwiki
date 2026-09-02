@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useSyncExternalStore } from 'react';
 import { Search } from 'lucide-react';
 import { useSearchStore } from '@/lib/store/searchStore';
 import { useStrings } from '@/components/providers/StringsProvider';
@@ -14,14 +14,16 @@ import { useStrings } from '@/components/providers/StringsProvider';
 export function SearchTrigger({ className = '' }: { className?: string }) {
   const t = useStrings();
   const open = useSearchStore((state) => state.open);
-  const [shortcut, setShortcut] = useState<string | null>(null);
 
   // The modifier differs by platform, and the platform is only known in the
   // browser — rendering a guess on the server would hydrate mismatched.
-  useEffect(() => {
-    const isMac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
-    setShortcut(isMac ? '⌘K' : 'Ctrl K');
-  }, []);
+  // `useSyncExternalStore` gives the server snapshot (nothing) and the
+  // client one without an effect-and-setState round trip.
+  const shortcut = useSyncExternalStore(
+    () => () => {},
+    () => (/Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent) ? '⌘K' : 'Ctrl K'),
+    () => null,
+  );
 
   return (
     // No aria-label: it read "Search documentation" while the control visibly
