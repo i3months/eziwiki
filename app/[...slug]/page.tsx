@@ -230,6 +230,7 @@ function ArticleSchema({ doc, url }: { doc: ContentDoc; url: string }) {
   const modified = getLastModified(doc.path)?.iso ?? published;
 
   return (
+    // nosemgrep -- jsonLd escapes what the script element could read
     <script
       type="application/ld+json"
       dangerouslySetInnerHTML={{
@@ -276,6 +277,7 @@ function BreadcrumbSchema({ path }: { path: string }) {
   if (!trail || trail.length < 2) return null;
 
   return (
+    // nosemgrep -- jsonLd escapes what the script element could read
     <script
       type="application/ld+json"
       dangerouslySetInnerHTML={{

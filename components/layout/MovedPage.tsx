@@ -31,6 +31,7 @@ export function MovedPage({ url, title }: { url: string; title: string }) {
           script — and only for them: left in for everyone it raced the
           script, and whichever navigation committed second won, so the
           fragment was kept or dropped by chance. */}
+      {/* nosemgrep -- the one interpolation is jsonLd-escaped */}
       <script
         dangerouslySetInnerHTML={{
           __html: `location.replace(${jsonLd(asset(url))}+location.search+location.hash)`,

@@ -46,6 +46,7 @@ function Highlighted({
 
   if (terms.length === 0) return <>{text}</>;
 
+  // nosemgrep -- every term was regex-escaped four lines up
   const parts = text.split(new RegExp(`(${terms.join('|')})`, 'gi'));
   const lowered = terms.map((term) => term.toLowerCase().replace(/\\(.)/g, '$1'));
 

@@ -178,6 +178,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     // would otherwise report the difference on every dark-mode load.
     <html lang={site.global.lang ?? DEFAULT_LANG} suppressHydrationWarning>
       <head>
+        {/* nosemgrep -- a constant written above, no data in it */}
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         {FONT_FACES.filter((font) => font.preload).map((font) => (
           <link
@@ -189,8 +190,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             crossOrigin="anonymous"
           />
         ))}
+        {/* nosemgrep -- assembled from constants and the base path */}
         <style dangerouslySetInnerHTML={{ __html: fontFaceCss }} />
+        {/* nosemgrep -- colours that passed the payload schema's hex pattern */}
         {theme && <style dangerouslySetInnerHTML={{ __html: theme }} />}
+        {/* nosemgrep -- jsonLd escapes what the script element could read */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

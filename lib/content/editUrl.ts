@@ -50,6 +50,7 @@ function getTemplate({ editUrl, repoUrl, editBranch }: EditConfig): string | nul
     return null;
   }
 
+  // nosemgrep -- a lookup in a fixed two-entry table, not a method call
   const forge = FORGES[host];
   return forge ? forge(webUrl(repoUrl), editBranch || DEFAULT_BRANCH) : null;
 }

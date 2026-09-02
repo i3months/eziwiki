@@ -44,6 +44,7 @@ function toRegExp(pattern: string): RegExp {
   // Case-insensitive: `Scans/` and `scans/` name the same directory on macOS
   // and Windows, and an author who wrote one and meant the other is not
   // helped by silence.
+  // nosemgrep -- escaping the pattern into this literal is this module's job
   const expression = new RegExp(`^${body}$`, 'i');
   compiled.set(pattern, expression);
 

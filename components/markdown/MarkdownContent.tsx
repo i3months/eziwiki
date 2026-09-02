@@ -34,6 +34,9 @@ interface MarkdownContentProps {
 export function MarkdownContent({ html }: MarkdownContentProps) {
   return (
     <>
+      {/* nosemgrep -- the html is produced by this site's own build from the
+          author's Markdown; raw HTML passing through is the documented trust
+          model (see Security Model in the README). */}
       <div className="ezw-prose" dangerouslySetInnerHTML={{ __html: html }} />
       <CodeCopy />
       <LinkPreview />
