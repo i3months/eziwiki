@@ -1,9 +1,0 @@
-# Codacy's bundled ESLint runs major 8, which cannot read this repository's
-# flat config; without one it falls back to Codacy's own rule set and reports
-# a hundred findings the project's real lint — ESLint 9, run in CI on every
-# push — does not. The real lint is the arbiter here.
-engines:
-  eslint-8:
-    enabled: false
-  eslint:
-    enabled: false
