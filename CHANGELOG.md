@@ -31,6 +31,26 @@ setting, and every such change is listed here with what to do about it.
   lockfile written by npm 11 was refused by npm 10. All three are fixed, and
   the lockfile rule is in CONTRIBUTING.
 
+### Accessibility
+
+- The tab strip is a well-formed tablist: the "+" button and the drag ghost
+  no longer sit inside it, and the close control is no longer a second
+  interactive element inside a tab — the pointer keeps its target, the
+  keyboard closes with Delete, and the tab says so. The two side rails carry
+  names, so a screen reader can tell them apart.
+- The home page speaks the wiki's language and title; it was the one screen
+  hardcoded in English.
+
+### A new wiki
+
+- The shipped GitHub Pages workflow now sets the site's origin as well as
+  its base path, so canonical links and the sitemap are right on the first
+  deploy instead of advertising example.com; a `SITE_URL` repository
+  variable overrides it for a custom domain. The README explains the three
+  steps to go live, the config says what `baseUrl` is for, and the site is
+  titled after the project name.
+- The starter guide now shows callouts, tags, file embeds and `npm run new`.
+
 ### Search
 
 - A Korean word with a particle or an ending — `설치를`, `배포하는` — finds
