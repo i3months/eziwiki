@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { PageTransition } from '@/components/markdown/PageTransition';
 import { pageUrl } from '@/lib/basePath';
+import { getSite } from '@/lib/site';
 import { payload } from '@/payload/config';
 
 export const metadata: Metadata = {
@@ -9,9 +10,14 @@ export const metadata: Metadata = {
 };
 
 /**
- * Home page - shows empty state for New Tab
+ * The home page: an empty state until a page is chosen.
+ *
+ * In the wiki's own words — it was the one screen hardcoded in English, on
+ * the address people share first.
  */
 export default function Home() {
+  const { global, strings } = getSite();
+
   return (
     <PageTransition>
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
@@ -30,11 +36,9 @@ export default function Home() {
             />
           </svg>
           <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-3">
-            Welcome to Documentation
+            {global.title || strings.homeEmptyTitle}
           </h2>
-          <p className="text-gray-600 dark:text-gray-400">
-            Select a page from the sidebar to get started, or click the + button to open a new tab.
-          </p>
+          <p className="text-gray-600 dark:text-gray-400">{strings.homeEmptyBody}</p>
         </div>
       </div>
     </PageTransition>

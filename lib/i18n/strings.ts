@@ -53,6 +53,10 @@ export interface Strings {
   skipToContent: string;
   /** Accessible name of the site navigation */
   navigation: string;
+  /** Heading on the home page before a page is chosen */
+  homeEmptyTitle: string;
+  /** What to do about it */
+  homeEmptyBody: string;
   /** Accessible name of the breadcrumb trail */
   breadcrumb: string;
   /** Steps back through visited pages */
@@ -219,6 +223,8 @@ const EN: Strings = {
   closeMenu: 'Close menu',
   skipToContent: 'Skip to content',
   navigation: 'Navigation',
+  homeEmptyTitle: 'Welcome',
+  homeEmptyBody: 'Pick a page from the sidebar, or press ⌘K to search.',
   breadcrumb: 'Breadcrumb',
   goBack: 'Go back',
   goForward: 'Go forward',
@@ -315,6 +321,8 @@ const KO: Strings = {
   closeMenu: '메뉴 닫기',
   skipToContent: '본문으로 건너뛰기',
   navigation: '탐색',
+  homeEmptyTitle: '환영합니다',
+  homeEmptyBody: '사이드바에서 페이지를 고르거나 ⌘K로 검색하세요.',
   breadcrumb: '현재 위치',
   goBack: '뒤로 가기',
   goForward: '앞으로 가기',
