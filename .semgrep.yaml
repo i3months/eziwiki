@@ -1,0 +1,17 @@
+# For Codacy's Opengrep, which otherwise applies its generic audit set —
+# a hundred "dynamically constructed path" findings against a build tool
+# whose whole job is constructing paths under content/ and public/. This
+# replaces that noise with the one pattern this project actually shipped a
+# vulnerability through, so the scanner guards the mistake we made rather
+# than the ones we cannot make.
+rules:
+  - id: eziwiki-jsonld-needs-escaping
+    languages: [typescript, javascript]
+    severity: ERROR
+    message: >
+      JSON.stringify inside an inline <script> can be broken out of by a
+      `</script>` in the data. Serialise with jsonLd() from lib/seo/jsonLd,
+      which escapes what the script element could read.
+    patterns:
+      - pattern: |
+          { __html: JSON.stringify($X) }

@@ -1,0 +1,12 @@
+# For Codacy's bundled ESLint only, which runs major 8 and cannot read
+# eslint.config.mjs — without a config it applies Codacy's own rule set and
+# reports a hundred findings the real lint does not. ESLint 9, which CI runs
+# on every push with the flat config, ignores this file entirely.
+root: true
+parser: '@typescript-eslint/parser'
+parserOptions:
+  ecmaVersion: 2022
+  sourceType: module
+  ecmaFeatures:
+    jsx: true
+rules: {}
