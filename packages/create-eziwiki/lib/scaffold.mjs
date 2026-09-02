@@ -20,10 +20,8 @@ import path from 'path';
 export const RENAME_ON_COPY = {
   gitignore: '.gitignore',
   npmrc: '.npmrc',
-  'eslintrc.js': '.eslintrc.js',
   prettierrc: '.prettierrc',
   prettierignore: '.prettierignore',
-  eslintignore: '.eslintignore',
 };
 
 /** Directory names never copied out of the template. */
@@ -88,7 +86,7 @@ export function buildProjectPackageJson(pkg, projectName, cliVersion) {
     name: projectName,
     version: '0.1.0',
     private: true,
-    description: `Documentation site built with eziwiki`,
+    description: 'Documentation site built with eziwiki',
     // The engine directories are copied in rather than depended on, so this
     // is the one place a project can say which release they came from — for
     // a bug report, and for knowing whether an update is due.

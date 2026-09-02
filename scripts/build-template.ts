@@ -44,8 +44,7 @@ const ROOT_FILES: Array<[source: string, target: string]> = [
   ['vitest.config.ts', 'vitest.config.ts'],
   ['next-env.d.ts', 'next-env.d.ts'],
   ['.gitignore', 'gitignore'],
-  ['.eslintrc.js', 'eslintrc.js'],
-  ['.eslintignore', 'eslintignore'],
+  ['eslint.config.mjs', 'eslint.config.mjs'],
   ['.prettierrc', 'prettierrc'],
   ['.prettierignore', 'prettierignore'],
 ];
