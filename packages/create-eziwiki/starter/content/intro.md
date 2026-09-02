@@ -19,7 +19,7 @@ there is nothing to register anywhere.
 
 - **Search** — press <kbd>⌘K</kbd> (or <kbd>Ctrl K</kbd>) to search titles, headings, and text
 - **Contents rail** — built automatically from each page's headings
-- **Wiki links** — write [[guides/writing]] and it resolves by path, file name, or title
+- **Wiki links** — write `[[guides/writing]]` and it resolves by path, file name, or title — like this: [[guides/writing]]
 - **Backlinks** — every page lists what links to it, at the bottom
 - **Graph** — see how your pages connect on the [Graph](/graph) page
 - **Dark mode**, syntax highlighting, and maths, with no configuration

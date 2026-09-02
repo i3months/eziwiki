@@ -4,6 +4,7 @@ import os from 'os';
 import path from 'path';
 import {
   buildProjectPackageJson,
+  titleFromName,
   checkTarget,
   copyTemplate,
   scaffold,
@@ -278,5 +279,13 @@ describe('buildProjectPackageJson provenance', () => {
   it('records nothing when no release is known', () => {
     const pkg = buildProjectPackageJson({ name: 'my-wiki', scripts: {} }, 'my-docs');
     expect(pkg.eziwiki).toBeUndefined();
+  });
+});
+
+describe('titleFromName', () => {
+  it('titles the site after the project', () => {
+    expect(titleFromName('my-docs')).toBe('My Docs');
+    expect(titleFromName('wiki')).toBe('Wiki');
+    expect(titleFromName('team_handbook')).toBe('Team Handbook');
   });
 });

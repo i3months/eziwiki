@@ -80,3 +80,30 @@ $$
 ## Back
 
 Return to [[intro]].
+
+## Callouts
+
+A blockquote that opens with a marker becomes a callout. The syntax is
+GitHub's and Obsidian's, so it reads as a plain quote anywhere else:
+
+> [!TIP]
+> `note`, `tip`, `important`, `warning` and `caution` each get their own
+> colour, and `> [!note]- Title` folds away.
+
+## Tags
+
+Add `tags: [setup, reference]` to a page's frontmatter and the tags appear
+under its title, each linking to a page listing everything that shares it.
+The index lives at [/tags](/tags/).
+
+## Embedding files
+
+`![[diagram.png]]` shows an image from `public/`, `![[spec.pdf]]` opens a
+document viewer right in the page, and `![[intro]]` includes another page's
+text — `![[intro#Getting started]]` just that section.
+
+## Starting a page
+
+`npm run new guides/deploying` creates the file, frontmatter and all, and
+tells you how to link to it. `npm run check:links` lists the pages your
+links are already asking for, most-wanted first.

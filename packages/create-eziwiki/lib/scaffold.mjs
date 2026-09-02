@@ -195,6 +195,8 @@ export function scaffold({ templateDir, targetDir, projectName, cliVersion }) {
 
   const files = copyTemplate(templateDir, targetDir);
 
+  seedTitle(targetDir, projectName);
+
   const manifestPath = path.join(targetDir, 'package.json');
   const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
 
@@ -232,4 +234,42 @@ export function renameLockfileRoot(targetDir, projectName) {
   }
 
   fs.writeFileSync(lockPath, `${JSON.stringify(lock, null, 2)}\n`, 'utf-8');
+}
+
+/**
+ * Titles the new site after its project name.
+ *
+ * `my-docs` became a site called "My Wiki", which read as someone else's.
+ * The placeholder is replaced in the config and the README; a template that
+ * has drifted from the placeholder is left alone.
+ *
+ * @param {string} targetDir - The scaffolded project
+ * @param {string} projectName - Name the project was created with
+ */
+export function seedTitle(targetDir, projectName) {
+  const title = titleFromName(projectName);
+
+  for (const [file, from, to] of [
+    ['payload/config.ts', "title: 'My Wiki',", `title: '${title.replace(/'/g, "\\'")}',`],
+    ['README.md', '# My Wiki', `# ${title}`],
+  ]) {
+    const at = path.join(targetDir, file);
+    if (!fs.existsSync(at)) continue;
+    const content = fs.readFileSync(at, 'utf-8');
+    if (!content.includes(from)) continue;
+    fs.writeFileSync(at, content.replace(from, to), 'utf-8');
+  }
+}
+
+/**
+ * Turns a package name into a title: `my-docs` is "My Docs".
+ *
+ * @param {string} name - Validated project name
+ * @returns {string} A human-readable title
+ */
+export function titleFromName(name) {
+  return name
+    .replace(/[-_]+/g, ' ')
+    .trim()
+    .replace(/\b\w/g, (c) => c.toUpperCase());
 }

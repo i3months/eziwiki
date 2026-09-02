@@ -60,10 +60,15 @@ jobs:
             esac
           fi
 
+      # The origin too, not only the base path: until `baseUrl` is set in
+      # payload/config.ts the canonical links and the sitemap say example.com.
+      # A SITE_URL repository variable overrides the guess — set it for a
+      # custom domain.
       - name: Build
         run: npm run build
         env:
           NEXT_PUBLIC_BASE_PATH: ${{ steps.base.outputs.path }}
+          NEXT_PUBLIC_SITE_URL: ${{ vars.SITE_URL || format('https://{0}.github.io', github.repository_owner) }}
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3

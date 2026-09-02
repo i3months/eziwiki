@@ -248,6 +248,18 @@ function main() {
   // Starter content and config replace this site's own.
   files += copyDir(STARTER_DIR, TEMPLATE_DIR, 'starter');
 
+  // The repository's own ignore rules mean nothing in a user's project, and
+  // they were the first thing in its first commit.
+  const ignorePath = path.join(TEMPLATE_DIR, 'gitignore');
+  if (fs.existsSync(ignorePath)) {
+    const RESIDUE = new Set(['.kiro', '.claude/', '/packages/create-eziwiki/template/']);
+    const kept = fs
+      .readFileSync(ignorePath, 'utf-8')
+      .split('\n')
+      .filter((line) => !RESIDUE.has(line.trim()));
+    fs.writeFileSync(ignorePath, kept.join('\n'), 'utf-8');
+  }
+
   fs.writeFileSync(
     path.join(TEMPLATE_DIR, 'package.json'),
     `${JSON.stringify(buildTemplateManifest(), null, 2)}\n`,

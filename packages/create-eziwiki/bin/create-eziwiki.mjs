@@ -80,7 +80,10 @@ function main() {
     npm run dev
 
   Then edit content/ to write pages, and payload/config.ts for the title,
-  navigation, and theme.
+  navigation, and theme. \`npm run new <path>\` starts a page for you.
+
+  A GitHub Pages deploy workflow is included — the README's Deploy section
+  says how to switch it on.
 `);
 }
 

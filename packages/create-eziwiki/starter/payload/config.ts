@@ -12,6 +12,13 @@ export const payload: Payload = {
     title: 'My Wiki',
     description: 'A documentation site built with eziwiki',
     favicon: '/favicon.svg',
+
+    /**
+     * The URL the site is published at. Canonical links, the sitemap,
+     * robots.txt and llms.txt are all written against it — until you set it,
+     * they advertise example.com. The shipped GitHub Pages workflow fills it
+     * in at build time; on any other host, set it here.
+     */
     baseUrl: 'https://example.com',
 
     /**
