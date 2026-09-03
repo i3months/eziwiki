@@ -289,3 +289,17 @@ describe('titleFromName', () => {
     expect(titleFromName('team_handbook')).toBe('Team Handbook');
   });
 });
+
+describe('validateProjectName on Windows-hostile names', () => {
+  it('refuses reserved device names and trailing dots', () => {
+    expect(validateProjectName('con').valid).toBe(false);
+    expect(validateProjectName('lpt1').valid).toBe(false);
+    expect(validateProjectName('nul.docs').valid).toBe(false);
+    expect(validateProjectName('docs.').valid).toBe(false);
+  });
+
+  it('keeps accepting names that merely contain them', () => {
+    expect(validateProjectName('console-docs').valid).toBe(true);
+    expect(validateProjectName('config').valid).toBe(true);
+  });
+});

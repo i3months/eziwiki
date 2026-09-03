@@ -22,12 +22,35 @@ import payload from '../payload/config';
  * @returns Problems found, empty when none
  */
 function checkFileNames(): string[] {
-  return getContentRegistry()
-    .docs.filter((doc) => /[#?%]/.test(doc.path))
-    .map(
-      (doc) =>
+  const problems: string[] = [];
+
+  for (const doc of getContentRegistry().docs) {
+    if (/[#?%]/.test(doc.path)) {
+      problems.push(
         `content/${doc.path}.md has a #, ? or % in its name, which no host can serve; rename it`,
-    );
+      );
+      continue;
+    }
+
+    // Windows refuses these outright — a reserved device name, a name ending
+    // in a dot or a space, or one of its forbidden characters. A page like
+    // this commits fine from macOS and then no Windows machine can check the
+    // repository out.
+    for (const segment of doc.path.split('/')) {
+      if (
+        /^(con|prn|aux|nul|com[0-9]|lpt[0-9])(\..*)?$/i.test(segment) ||
+        /[. ]$/.test(segment) ||
+        /[<>:"|*\\]/.test(segment)
+      ) {
+        problems.push(
+          `content/${doc.path}.md cannot exist on Windows (reserved name, trailing dot or space, or a <>:"|*\\ character); rename it`,
+        );
+        break;
+      }
+    }
+  }
+
+  return problems;
 }
 
 /**

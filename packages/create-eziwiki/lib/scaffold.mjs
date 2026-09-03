@@ -66,6 +66,16 @@ export function validateProjectName(name) {
     };
   }
 
+  // The name becomes a directory, and Windows refuses these: its reserved
+  // device names, and anything ending in a dot. `npx create-eziwiki con`
+  // would talk to the console device rather than make a folder.
+  if (/^(con|prn|aux|nul|com[0-9]|lpt[0-9])(\..*)?$/.test(name) || name.endsWith('.')) {
+    return {
+      valid: false,
+      problem: 'Project name cannot be a Windows reserved name or end with a dot.',
+    };
+  }
+
   return { valid: true };
 }
 
