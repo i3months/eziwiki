@@ -67,16 +67,13 @@ git push --follow-tags
 ```
 
 The `Release` workflow checks the tag against the package version, rebuilds
-and tests the template, and publishes with provenance. It authenticates one
-of two ways, and one of them has to be set up once:
-
-- an `NPM_TOKEN` repository secret holding an npm automation token with
-  publish rights, or
-- [npm trusted publishing](https://docs.npmjs.com/trusted-publishers) for
-  this repository and workflow, in which case no token is needed and the
-  `NODE_AUTH_TOKEN` line in `release.yml` can go.
-
-Until one is configured the workflow fails at the publish step.
+and tests the template, and publishes with provenance. It authenticates by
+[npm trusted publishing](https://docs.npmjs.com/trusted-publishers) — no
+token, no secret. The one-time setup, done once on npmjs.com by a package
+maintainer: the `create-eziwiki` package's **Settings → Trusted Publisher**,
+choosing GitHub Actions with repository `i3months/eziwiki` and workflow
+`release.yml` (environment left blank). Until that is registered the
+workflow fails at the publish step.
 
 Add a heading for the version to `CHANGELOG.md` before tagging; the
 _Unreleased_ section becomes that release's notes.
