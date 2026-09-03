@@ -7,8 +7,8 @@
     "node": ">=22.13.0"
   },
   "scripts": {
-    "dev": "npm run build:search && npm run build:pdfjs && npm run build:pdf-images && next dev",
-    "build": "npm run validate:payload && npm run check:links && npm run build:search && npm run build:pdfjs && npm run build:pdf-images && next build",
+    "dev": "npm run build:pdfjs && npm run build:pdf-images && next dev",
+    "build": "npm run validate:payload && npm run check:links && npm run build:pdfjs && npm run build:pdf-images && next build",
     "export": "npm run build",
     "start": "next start",
     "lint": "eslint .",
@@ -19,13 +19,14 @@
     "validate:payload": "tsx scripts/validate-payload.ts",
     "show-urls": "tsx scripts/show-urls.ts",
     "new": "tsx scripts/new-page.ts",
-    "build:search": "tsx scripts/build-search-index.ts",
     "build:pdfjs": "tsx scripts/copy-pdfjs-assets.ts",
     "build:pdf-images": "tsx scripts/build-pdf-images.ts",
     "check:links": "tsx scripts/check-links.ts",
     "build:template": "tsx scripts/build-template.ts",
     "lint:fix": "eslint . --fix",
-    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,css}\""
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,css}\"",
+    "predev": "node -e \"fs.rmSync('public/search-index.json',{force:true})\"",
+    "prebuild": "node -e \"fs.rmSync('public/search-index.json',{force:true})\""
   },
   "dependencies": {
     "@shikijs/rehype": "^4.3.1",

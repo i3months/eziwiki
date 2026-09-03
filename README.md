@@ -265,8 +265,10 @@ search box in the sidebar.
 
 Full-text search covers page titles, every heading, and page contents. Results
 link straight to the matching section rather than the top of the page. The index
-is generated at build time into `public/search-index.json` and searched entirely
-in the browser — no server, no third-party service, works on any static host.
+is derived from the content at build time — in development it is fresh on
+every request, so a page saved a moment ago is already searchable — and it is
+searched entirely in the browser: no server, no third-party service, works on
+any static host.
 
 It is fetched the first time you search, so pages that are only read never
 download it.
@@ -716,7 +718,6 @@ npm run build            # Build for production into out/
 npm run validate:payload # Check configuration
 npm run check:links      # Report unresolved links and pages worth writing (--strict fails on them)
 npm run new <path>       # Create a page, frontmatter and all
-npm run build:search     # Regenerate the search index
 npm run build:pdfjs      # Stage the document viewer's assets under public/
 npm run build:pdf-images # Draw embedded PDFs' pages (needs @napi-rs/canvas)
 npm run show-urls        # List every page and its URL

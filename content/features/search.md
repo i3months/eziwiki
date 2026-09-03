@@ -61,20 +61,14 @@ exact match still scores highest.
 
 ## How it works
 
-The index is generated at build time into `public/search-index.json` and
-searched entirely in the browser. There is no server to run and no third-party
-service to sign up for — it works on GitHub Pages, S3, or any static host.
+The index is derived from the content and served at `/search-index.json` —
+written out as a static file by the build, so it works on GitHub Pages, S3,
+or any static host with no server to run and no third-party service to sign
+up for. In development it is derived fresh on every request: a page you saved
+a moment ago is already searchable.
 
 The index and the search library are fetched the first time you actually search,
 so readers who never open the palette never download them.
-
-Regenerate it manually with:
-
-```bash
-npm run build:search
-```
-
-It also runs automatically as part of `npm run dev` and `npm run build`.
 
 ## What is excluded
 
