@@ -101,7 +101,9 @@ describe('splitSections', () => {
 describe('buildSearchIndex', () => {
   it('indexes every visible page and its sections', async () => {
     const index = await buildSearchIndex();
-    const paths = new Set(index.docs.map((doc) => doc.path));
+    // The page's path is the id's first half; the field itself was dropped
+    // from the index, since nothing in the browser read it.
+    const paths = new Set(index.docs.map((doc) => doc.id.split('#')[0]));
 
     expect(index.docs.length).toBeGreaterThan(paths.size);
     expect(paths.has('getting-started/quick-start')).toBe(true);
@@ -114,7 +116,7 @@ describe('buildSearchIndex', () => {
     expect(hiddenPaths.size).toBeGreaterThan(0);
 
     for (const hidden of hiddenPaths) {
-      expect(index.docs.some((doc) => doc.path === hidden)).toBe(false);
+      expect(index.docs.some((doc) => doc.id.split('#')[0] === hidden)).toBe(false);
     }
   });
 
@@ -125,10 +127,10 @@ describe('buildSearchIndex', () => {
     expect(sections.length).toBeGreaterThan(0);
 
     for (const section of sections) {
-      // Every section should have resolved an anchor; a bare page URL means the
-      // heading could not be matched to the rendered document.
-      expect(section.anchor).toBeDefined();
-      expect(section.url).toBe(`/${section.path}#${section.anchor}`);
+      // Every section should carry an anchor in its URL; a bare page URL
+      // means the heading could not be matched to the rendered document.
+      const path = section.id.split('#')[0];
+      expect(section.url).toMatch(new RegExp(`^/${path}#.+`));
     }
   });
 

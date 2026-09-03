@@ -149,7 +149,6 @@ describe('search with Korean content', () => {
       docs: [
         {
           id: 'ko',
-          path: 'ko',
           url: '/ko',
           title: '한국어 문서',
           body: '위키문서를 만드는 방법을 설명합니다.',

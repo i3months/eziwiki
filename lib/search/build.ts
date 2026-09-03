@@ -200,7 +200,6 @@ export async function buildSearchIndex(): Promise<SearchIndex> {
 
     entries.push({
       id: doc.path,
-      path: doc.path,
       url: href,
       title: doc.title,
       description: doc.description,
@@ -217,15 +216,18 @@ export async function buildSearchIndex(): Promise<SearchIndex> {
     sections.forEach((section, index) => {
       const anchor = anchors[index];
 
+      const body = markdownToText(section.markdown).slice(0, MAX_BODY_CHARS);
+
       entries.push({
         id: anchor ? `${doc.path}#${anchor}` : `${doc.path}#${index}`,
-        path: doc.path,
         url: anchor ? `${href}#${anchor}` : href,
         title: doc.title,
         section: section.heading,
-        anchor,
-        description: doc.description,
-        body: markdownToText(section.markdown).slice(0, MAX_BODY_CHARS),
+        body,
+        // Only where the excerpt will need it — a heading with nothing but
+        // subsections beneath it. Repeated on every section it was a third
+        // of a megabyte at a thousand pages.
+        ...(body ? {} : { description: doc.description }),
       });
     });
   }

@@ -9,17 +9,16 @@
 export interface SearchDoc {
   /** Stable identifier, `path` for a page and `path#anchor` for a section */
   id: string;
-  /** Content-relative path of the source document */
-  path: string;
   /** Href to navigate to, resolved under the site's URL strategy */
   url: string;
   /** Title of the page this entry belongs to */
   title: string;
   /** Heading text when this entry is a section, otherwise undefined */
   section?: string;
-  /** Anchor id of the section, when applicable */
-  anchor?: string;
-  /** Page description from frontmatter */
+  /**
+   * Page description from frontmatter — on the page entry, and on a section
+   * with no text of its own, where the excerpt falls back to it
+   */
   description?: string;
   /** Plain-text body of the page or section, used for matching and previews */
   body: string;
@@ -42,7 +41,7 @@ export interface SearchIndex {
 }
 
 /** Current index format version. Bump when the SearchDoc shape changes. */
-export const SEARCH_INDEX_VERSION = 2;
+export const SEARCH_INDEX_VERSION = 3;
 
 /** Public path the generated index is served from. */
 export const SEARCH_INDEX_PATH = '/search-index.json';
