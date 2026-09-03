@@ -81,6 +81,36 @@ jobs:
       - name: Run tests
         run: npm test
 
+  test-windows:
+    name: Test (Windows)
+    runs-on: windows-latest
+    timeout-minutes: 20
+
+    # The tool has only ever run on unix; this leg is what holds the path
+    # handling, the line endings and the scripts to their word on the other
+    # separator. Lint runs here too, since a CRLF checkout is exactly what
+    # it guards against.
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+      - name: Lint
+        run: npm run lint
+
   build:
     name: Build
     runs-on: ubuntu-latest
