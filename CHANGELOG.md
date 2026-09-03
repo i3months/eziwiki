@@ -7,6 +7,24 @@ setting, and every such change is listed here with what to do about it.
 
 ## Unreleased
 
+### Windows
+
+- The repository holds its line endings: a default Windows clone used to
+  arrive in CRLF and fail the lint on every line of every file. And a page
+  or project named what Windows reserves — `con`, `aux.md`, a trailing dot —
+  is refused before it can be committed, since one such file breaks
+  `git clone` for every Windows user after it. CI now runs the tests and
+  the lint on a Windows runner.
+
+### Changed since the majors
+
+- The search index is served by the site itself rather than written into
+  `public/` by a build step. In development it is fresh on every request —
+  a page saved a moment ago is already searchable, where it used to take a
+  restart — and `npm run dev` starts one step sooner. The index also slims
+  by a fifth: fields nothing in the browser read are gone, and a page's
+  description is no longer repeated on its every section.
+
 ### Major upgrades
 
 - **Next.js 16, React 19, pdf.js 6, ESLint 9.** Builds run on Turbopack —
