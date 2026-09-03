@@ -19,6 +19,7 @@ import path from 'path';
  */
 export const RENAME_ON_COPY = {
   gitignore: '.gitignore',
+  gitattributes: '.gitattributes',
   npmrc: '.npmrc',
   prettierrc: '.prettierrc',
   prettierignore: '.prettierignore',

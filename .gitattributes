@@ -1,0 +1,12 @@
+# One line ending in the repository, whatever the platform: Prettier runs as
+# a lint rule and expects LF, so a default Windows clone (autocrlf) otherwise
+# fails the lint on every line of every file.
+* text=auto eol=lf
+
+*.woff2 binary
+*.woff binary
+*.pdf binary
+*.webp binary
+*.png binary
+*.jpg binary
+*.ico binary
